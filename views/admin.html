@@ -10,17 +10,79 @@
 					var state      = data_array[0];
 					var msg        = data_array[1];
 				    if(state=="OK")
+					{
 						alert("User added.");
+						location.reload();
+					}
 					else
 						alert("Failure: "+msg);
 					return false;
 				   });
 			return true;
 		}
+		
+		function addArea(){
+			$.post("actions/add_area.php",
+					{area: $("#add_area_name").val()},
+					function(data){
+						var data_array = data.split(";");
+						var state      = data_array[0];
+						var msg        = data_array[1];
+						if(state == "OK"){
+							alert("Area added.");
+							location.reload();
+						}
+						else
+							alert("Failure: "+msg);
+						return true;
+					}
+			);
+			return true;
+		}
+		
+		function deleteArea(){
+			$.post("actions/delete_area.php",
+					{area: $("#delete_area_item").val()},
+					function(data){
+						var data_array = data.split(";");
+						var state      = data_array[0];
+						var msg        = data_array[1];
+						if(state == "OK"){
+							alert("Area deleted.");
+							location.reload();
+						}
+						else
+							alert("Failure: "+msg);
+						return true;
+					}
+			);
+			return true;
+		}
+		
+		function userAreaChange(){
+			var username = this.value;
+			$.post("actions/mod_user_area_assoc.php",
+				   {user: username},
+				   function(data){
+						var data_array = data.split("###");
+						var state      = data_array[0];
+						var msg        = data_array[1];
+						if(state == "OK"){
+							$("#associated_selections").html(msg);
+							var r = $.getScript("js/mod_user_area_assoc.js");
+						}
+						else
+							alert("Failure: "+msg);
+						return true;
+				   });
+		}
 	
 		$("input:button").button();
 		$("input:reset").button();
 		$("#submit_new_user").click(createUser);
+		$("#submit_delete_area").click(deleteArea);
+		$("#submit_add_area").click(addArea);
+		$("#associate_user_name").change(userAreaChange);
 	});
 </script>
 
@@ -28,12 +90,42 @@
 <div id="admin_panel">
 	<h3>Create user</h3>
 	<div id="create_user_box">
-		<form>
-			<table>
+		<table>
+			<form>
 				<tr><th>Username</th><td><input type="text" id="new_user_name"/></td></tr>
 				<tr><th>Password</th><td><input type="password" id="new_user_password"/></td></tr>
 				<tr><td><input type="button" value="create" id="submit_new_user"/></td><td><input type="reset" value="clear"/></td></tr>
-			</table>
-		</form>
+			</form>
+		</table>
 	</div>
+	<h3>Associate User to Area</h3>
+	<script id="assoc_script">
+	</script>
+	<table>
+		<tr align="center"><td colspan="3">
+			<select id="associate_user_name">
+				<option>-- no user --</option>
+				<?php
+					$request = "SELECT user_name FROM user";
+					$result  = mysql_query($request) or die("Could not get list of users.");
+					while($row = mysql_fetch_assoc($result)){
+						echo "<option>".$row["user_name"]."</option>";
+					}
+				?>
+			</select>
+		</td></tr>
+		<tr><th>Associated</th><td></td><th>Not Associated</th></tr>
+		<tr id="associated_selections"></tr>
+	</table>
+	<h3>Document Areas</h3>
+	<table>
+		<tr><th>Delete Area:</th><td><select id="delete_area_item"><?php
+													$request = "SELECT area_name FROM area";
+													$result  = mysql_query($request) or die("Could not get area data.");
+													while($row = mysql_fetch_assoc($result)){
+														echo "<option>".$row["area_name"]."</option>";
+													}
+												?></select</td><td><input type="button" value="delete" id="submit_delete_area"/></td></tr>
+		<tr><th>Add area</th><td><input type="text" id="add_area_name"/></td><td><input type="button" value="add" id="submit_add_area"/></td></tr>
+	</table>
 </div>

@@ -61,7 +61,9 @@
 		</div>
 	</section>	
 	<footer>  
-		<p>Sappho Document Management System (c) 2011 by Daniel Eder</p>
+		<p>Sappho Document Management System (c) 2011 by Daniel Eder
+		   <?php if(isset($_SESSION["logged_in"]))
+					echo '| <a href="index.php?view=admin">Admin</a>';?></p>
 	</footer>  
 </body>  
 </html>
