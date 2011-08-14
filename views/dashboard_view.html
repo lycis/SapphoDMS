@@ -1,0 +1,21 @@
+<!-- JQUERY CODE -->
+<script>
+</script>
+
+<!-- LAYOUT -->
+<div id="dashboard">
+   	<div id="dash_welcome">
+		<h3>Hello, [Username]!</h3>
+		<p>This is your Dashboard where you'll find all recent changes!</p>
+	</div>
+   <div id="dash_area">
+		<div id="dash_news">
+			<h3>Latest News</h3>
+			<?php include("actions/news.php"); ?>
+		</div>
+		<div id="dash_recent">
+			<h3>Recent Changes</h3>
+			<?php include("actions/latest_changes.php") ?>
+		</div>
+   </div>
+ </div>

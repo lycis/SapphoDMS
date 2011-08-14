@@ -1,0 +1,30 @@
+<!-- JQUERY -->
+<script>
+	$(function(){
+		function doLogin(){
+			$("#login_box").html("<p align='center'>Logging you in...</p>");
+			$.post("actions/login.php", {username: $("#login_username").val(),
+										 password: $("#login_password").val()}, function(data){
+											location.reload();
+											return true;
+										});
+		}
+		
+		$("input:reset").button();
+		$("input:button").button();
+		$("#login_do_button").click(doLogin);
+	});
+</script>
+
+<!-- LAYOUT -->
+<div id="login_panel">
+	<div id="login_box">
+		<form>
+			<table style="margin: 0 auto;">
+				<tr><th>Username:</th><td><input type="text" class="login_textfield" id="login_username"/></td></tr>
+				<tr><th>Password:</th><td><input type="password" class="login_textfield" id="login_password"/></td></tr>
+				<tr><td><input type="button" value="log in" id="login_do_button"/></td><td><input type="reset" value="clear"/></td></tr>
+			</table>
+		</form>
+	</div>
+</div>

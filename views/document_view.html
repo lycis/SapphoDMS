@@ -1,0 +1,47 @@
+<!-- JQuery -->
+<script>
+	$(function(){
+			function toggleDocument(){
+				$("#document").toggle("highlight", {}, 500);
+				$("#document_spacer").show("highlight", {}, 500);
+			}
+			
+			function loadDocument(did){
+				var old_id = $("#document_last_id").val();
+				if(old_id == did)
+					toggleDocument();
+				$("#document_last_id").val(did);
+				
+				if($("#document").is(":hidden")) return false;
+				
+				$("#document_content").html('<p>Loading document...</p>');
+				$.post("actions/document.php", {id: did}, function(data){
+							$("#document_content").html(data);
+							return true;
+						}
+				);
+			}
+			
+			$(".document_link").click(function(){
+				var item = $(this);
+				loadDocument(item.attr("document_id"));
+				return false;
+			});
+			
+			$("#document").hide();
+			$("#document_last_id").val(-1);
+			
+		}
+	);
+</script>
+
+<!-- Layout -->
+<div id="folderlist">  
+	<h3>Documents</h3>
+	<?php include("actions/folderlist.php"); ?>
+</div> 
+<div id="document">
+	<div id="document_content">asdf</div>
+</div>
+<div id="document_spacer"></div>
+<input type="hidden" id="document_last_id" />
