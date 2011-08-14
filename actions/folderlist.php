@@ -65,15 +65,6 @@
 		echo "</li>";
 	}
 	
-	
-/*	echo 	"<li><span class=\"folder\">Folder 1</span>";
-	echo		"<ul>";
-	echo 			"<li><span class=\"file\"><a href=\"#\" class=\"document_link\" document_id=\"1\">Document 1.1</a></span></li>";
-	echo		"</ul>";
-	echo 	"</li>";
-	echo "</ul>";
-	echo "</div>";*/
-	
 	mysql_close($db_conn);
 	
 	function dive_into_folder($folder_id, $area_id){

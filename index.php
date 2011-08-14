@@ -67,6 +67,3 @@
 	</footer>  
 </body>  
 </html>
-<?php
-	mysql_close_db();
-?>
