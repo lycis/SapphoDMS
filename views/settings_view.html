@@ -1,0 +1,47 @@
+<!-- JQUERY -->
+<script>
+	$(function(){
+		function changeNames(){
+			alert($("#name_first").val()+" = "+$("#name_last").val());
+			$.post("actions/change_name.php",
+				   {first: $("#name_first").val(),
+				    last: $("#name_last").val()},
+				   function(data){
+						if(data=="OK")
+							location.reload();
+						else
+							alert("Could not update your profile!");
+				   });
+		}
+		
+		$("input:button").button();
+		$("input:reset").button();
+		$("#name_change_submit").click(changeNames);
+	});
+</script>
+
+<!-- LAYOUT -->
+<div id="settings_panel">
+	<h3>Settings</h3>
+	<div id="settings_name">
+		<h4>Name</h4>
+		<form>
+			<table>
+				<tr><th>Fist Name:</th><td><input type="text" class="textfield" id="name_first" value="<?php echo $_SESSION["first_name"]?>"/></td></tr>
+				<tr><th>Last Name:</th><td><input type="text" class="textfield" id="name_last" value="<?php echo $_SESSION["last_name"]?>"/></td></tr>
+				<tr><td><input type="button" value="change" id="name_change_submit"/></td><td><input type="reset" value="clear" /></td></tr>
+			</table>
+		</form>
+	</div>
+	<div id="settings_password">
+		<h4>Password</h4>
+		<form>
+			<table>
+				<tr><th>Old password:</th><td><input type="text" class="textfield" id="password_old"/></td></tr>
+				<tr><th>New password:</th><td><input type="password" class="textfield" id="password_new"/></td></tr>
+				<tr><th>Re-Enter:</th><td><input type="password" class="textfield" id="password_retype"/></td></tr>
+				<tr><td><input type="button" value="change" /></td><td><input type="reset" value="clear" /></td></tr>
+			</table>
+		</form>
+	</div>
+</div>

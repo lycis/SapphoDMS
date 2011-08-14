@@ -2,9 +2,8 @@
 <?php
 	session_start();
 	
-	include("config.php");
-	mysql_connect($db_host,$db_user,$db_password) or die("The database host is not available!");
-	mysql_select_db($db_name) or die("The database is not accessible!");
+	include("open_script.php");
+	
 	if(!isset($_GET["view"])) $_GET["view"] = "dashboard";
 ?>
 <html>  
@@ -50,11 +49,12 @@
 	<section id="contentBox">
 		<div id="content">
 			<?php
-				if(!isset($_SESSION["logged_in"])){include("views/login.html");}
+				if($_GET["view"] == "admin"){include("views/admin.html");}
+				else if(!isset($_SESSION["logged_in"])){include("views/login.html");}
 				else if($_SESSION["logged_in"] != 1){include("views/login.html");}
 				else if($_GET["view"] == "repository"){ include("views/document_view.html"); }
                 else if($_GET["view"] == "dashboard"){ include("views/dashboard_view.html"); }
-				else if($_GET["view"] == "settings"){ include("settings_view.html"); }
+				else if($_GET["view"] == "settings"){ include("views/settings_view.html"); }
 				else if($_GET["view"] == "search"){ include("search_view.html"); }
 			?>
 				 

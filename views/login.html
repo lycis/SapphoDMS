@@ -2,12 +2,20 @@
 <script>
 	$(function(){
 		function doLogin(){
-			$("#login_box").html("<p align='center'>Logging you in...</p>");
 			$.post("actions/login.php", {username: $("#login_username").val(),
 										 password: $("#login_password").val()}, function(data){
+											if(data == "NOK"){
+												$("#login_box").html(
+													"<p>Password or username are incorrect!</p>"+
+													"<p><input type='button' value='Try again' onClick='javascript:location.reload()'/></p>"
+												);
+												$("input:button").button();
+												return false;
+											}
 											location.reload();
-											return true;
-										});
+			return true;
+			});
+			$("#login_box").html("<p align='center'>Logging you in...</p>");
 		}
 		
 		$("input:reset").button();

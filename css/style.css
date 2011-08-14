@@ -3,7 +3,24 @@
 header, footer, aside, nav, article{  
     display: block;
 	margin-left: 44px;
-}  
+}
+
+input[type=text]{
+	border-radius: 15px;
+	border: #ccc solid 1px;
+	padding: 3px;
+}
+
+input[type=password]{
+	border-radius: 15px;
+	border: #ccc solid 1px;
+	padding: 3px;
+}
+
+th{
+	text-decoration: bold;
+	color: #1c94c4;
+}
    
 body {  
     margin: 0 auto;  
@@ -226,13 +243,45 @@ footer p{
 	width: 20%;
 }
 
-#login_box  th{
-	text-decoration: bold;
-	color: #1c94c4;
+/*****************************************************
+     DASHBOARD VIEW
+******************************************************/
+#admin_panel{
+	display: table-cell;
+	width: 99%;
+	box-shadow: 3px 3px 7px #777;
+	padding: 5px;
 }
 
-.login_textfield{
+/*****************************************************
+     DASHBOARD VIEW
+******************************************************/
+#settings_panel{
+	display: table-cell;
+	width: 99%;
+	box-shadow: 3px 3px 7px #777;
+	padding: 5px;
+}
+
+#settings_name{
+	display: blocked;
+	width: 20%;
+	background: #fff;
+	box-shadow: 3px 3px 7px #777;
+	padding: 5px;
+	text-align: center;
 	border-radius: 15px;
-	border: #ccc solid 1px;
-	padding: 3px;
+	margin: 0 auto;
+}
+
+#settings_password{
+	display: blocked;
+	width: 20%;
+	background: #fff;
+	box-shadow: 3px 3px 7px #777;
+	padding: 5px;
+	text-align: center;
+	border-radius: 15px;
+	margin: 0 auto;
+	margin-top: 15px;
 }

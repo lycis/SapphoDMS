@@ -1,0 +1,39 @@
+<!-- JQUERY -->
+<script>
+	$(function(){
+		function createUser(){	
+			$.post("actions/create_user.php",
+				   {username: $("#new_user_name").val(),
+				    password: $("#new_user_password").val()},
+				   function(data){
+				    var data_array = data.split(";");
+					var state      = data_array[0];
+					var msg        = data_array[1];
+				    if(state=="OK")
+						alert("User added.");
+					else
+						alert("Failure: "+msg);
+					return false;
+				   });
+			return true;
+		}
+	
+		$("input:button").button();
+		$("input:reset").button();
+		$("#submit_new_user").click(createUser);
+	});
+</script>
+
+<!-- LAYOUT -->
+<div id="admin_panel">
+	<h3>Create user</h3>
+	<div id="create_user_box">
+		<form>
+			<table>
+				<tr><th>Username</th><td><input type="text" id="new_user_name"/></td></tr>
+				<tr><th>Password</th><td><input type="password" id="new_user_password"/></td></tr>
+				<tr><td><input type="button" value="create" id="submit_new_user"/></td><td><input type="reset" value="clear"/></td></tr>
+			</table>
+		</form>
+	</div>
+</div>
