@@ -15,6 +15,7 @@
 	<script language="javascript" src="js/jquery-1.6.2.js"></script>
 	<script language="javascript" src="js/jquery-ui-1.8.15.custom.min.js"></script>
 	<script language="javascript" src="js/jquery.treeview.js"></script>
+	<script language="javascript" src="actions/ckeditor/ckeditor_source.js"></script>
 	
 	<!-- JQUERY -->
 	<script>
@@ -27,6 +28,10 @@
 			}
 			
 			$("#logout_link").click(doLogout);
+			
+			var content_height = window.innerHeight-200;
+			if(content_height < 600) content_height = 600;
+			$("#contentBox").height(content_height);
 		});
 	</script>
 </head>  

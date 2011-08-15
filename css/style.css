@@ -149,6 +149,7 @@ footer p{
 #folderlist{
    display: table-cell;
    width: 20%;
+   height: 100%;
    padding: 5px;
    box-shadow: 3px 3px 7px #777;
 }
@@ -225,7 +226,7 @@ footer p{
 }
 
 /*****************************************************
-     DASHBOARD VIEW
+     LOGIN VIEW
 ******************************************************/
 #login_panel{
 	display: table-cell;

@@ -14,12 +14,23 @@ $(function() {
 			if($("#document").is(":hidden")) return false;
 				
 			$("#document_content").html('<p>Loading document...</p>');
-			$.post("actions/document.php", {id: did}, function(data){
-				$("#document_content").html(data);
-				return true;
-				}
+			
+			var instance = CKEDITOR.instances["document_"+did];
+			if(instance)
+			{
+				CKEDITOR.remove(instance);
+			}
+						
+			$.post("actions/document.php",
+					{mode: "read", id: did}, 
+					function(data){
+						$("#document_content").html(data);
+						$.getScript("js/load_document_jquery.js");
+						return true;
+					}
 			);
 	}
+			
 			
 	$("#fileview").treeview({ 
 								collapsed: true, 
