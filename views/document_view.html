@@ -5,6 +5,7 @@
 				var areaName = this.value;
 				$.post("actions/folderlist.php", {area: areaName},
 						function(data){
+							$.getScript("js/folderlist_script.js");
 							$("#folderlist_folders").html(data);
 						}
 				);
