@@ -43,6 +43,23 @@ $(function(){
 		);
 	}
 	
+	function unlockDocument(did){
+		$("#document_content").html('<p>Unlocking document...</p>');
+						
+		$.post("actions/document.php",
+				{mode: "unlock", id: did}, 
+				function(data){
+					var data_array = data.split(";");
+					state_id = data[0];
+					msg      = data[1];
+					$("#document_content").html(msg);
+					if(state_id != "NOK")
+						loadDocument(parseInt(state_id));
+					return true;
+				}
+		);
+	}
+	
 	function doCancel(did){
 		$("#confirm-dialog").dialog({
 				resizable: false,
@@ -52,7 +69,7 @@ $(function(){
 				buttons: {
 					"Yes": function() {
 						$( this ).dialog( "close" );
-						loadDocument(did);
+						unlockDocument(did);
 					},
 					"No": function() {
 						$( this ).dialog( "close" );
