@@ -24,23 +24,57 @@ $(function(){
 			);
 	}
 	
-		function loadDocument(did){
-			$("#document_content").html('<p>Loading document...</p>');
-			
-			var instance = CKEDITOR.instances["document_"+did];
-			if(instance)
-			{
-				CKEDITOR.remove(instance);
-			}
+	function loadDocument(did){		
+		$("#document_content").html('<p>Loading document...</p>');
+		
+		var instance = CKEDITOR.instances["document_"+did];
+		if(instance)
+		{
+			CKEDITOR.remove(instance);
+		}
 						
-			$.post("actions/document.php",
-					{mode: "read", id: did}, 
-					function(data){
-						$("#document_content").html(data);
-						$.getScript("js/load_document_jquery.js");
-						return true;
+		$.post("actions/document.php",
+				{mode: "read", id: did}, 
+				function(data){
+					$("#document_content").html(data);
+					$.getScript("js/load_document_jquery.js");
+					return true;
+				}
+		);
+	}
+	
+	function doCancel(did){
+		$("#confirm-dialog").dialog({
+				resizable: false,
+				height: 200,
+				width: 400,
+				modal: true,
+				buttons: {
+					"Yes": function() {
+						$( this ).dialog( "close" );
+						loadDocument(did);
+					},
+					"No": function() {
+						$( this ).dialog( "close" );
 					}
-			);
+				}
+			});
+		return true;
+	}
+	
+	function saveDocument(){
+		var did = $("#document_id").val();
+		var instance = CKEDITOR.instances["document_"+did];
+		
+		if(!instance){
+			alert("Error: No editor available!");
+			return true;
+		}
+		
+		$.post("actions/save_document.php",
+			   {id: did, content: instance.getData()},
+			   function(data){
+			   });
 	}
 	
 	$("input:button").button();
@@ -55,7 +89,9 @@ $(function(){
 	});
 	$("#document_cancel").click(function(){
 		var item = $("#document_id");
-		loadDocument(item.val());
+		doCancel(item.val());
 		return false;
 	});
+	$("#document_save").click(saveDocument);
+	$("#confirm-dialog").hide();
 });

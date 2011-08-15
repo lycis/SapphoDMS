@@ -31,7 +31,6 @@ $(function() {
 			);
 	}
 			
-			
 	$("#fileview").treeview({ 
 								collapsed: true, 
 								animated: "fast"
