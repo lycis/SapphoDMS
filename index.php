@@ -8,7 +8,7 @@
 ?>
 <html>  
 <head>  
-	<title>Sappho - Interactive Document Management</title>  
+	<title><?php echo $site_title; ?></title>  
 	<link href="css/style.css" rel="stylesheet" type="text/css">
 	<link href="css/jquery-ui-1.8.15.custom.css" rel="stylesheet" text="text/css">
 	<link href="css/jquery.treeview.css" rel="stylesheet" text="text/css">
@@ -37,7 +37,7 @@
 </head>  
 <body>  
 	<header> 
-		<h1>Sappho: Document Repository</h1>  
+		<h1><?php echo $site_caption; ?></h1>  
 	</header>  
 	<nav>  
 		<ul>

@@ -90,7 +90,7 @@
 	{
 		$request = "SELECT object_type FROM object WHERE object_id = $did";
 		$result  = mysql_query($request) or die("Error while loading document: ".mysql_error());
-		if(mysql_num_rows($result) < 1) die("Requested document does not exist.");
+		if(mysql_num_rows($result) < 1) die("Requested document (#$did) does not exist.");
 		
 		$row = mysql_fetch_assoc($result);
 		$oid = $row["object_type"];
@@ -98,7 +98,7 @@
 		
 		$request = "SELECT object_data_text FROM object_data WHERE object_data_id = $did";
 		$result  = mysql_query($request) or die("Error while loading document data: ".mysql_error());
-		if(mysql_num_rows($result) < 1) die("Requested document does not have any data.");
+		if(mysql_num_rows($result) < 1) die("Requested document (#$did) does not have any data.");
 		$row = mysql_fetch_assoc($result);
 		
 		return $row["object_data_text"];

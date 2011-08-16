@@ -3,7 +3,7 @@
 	$(function(){
 			function areaChanged(){
 				var areaName = this.value;
-				$.post("actions/folderlist.php", {area: areaName},
+				$.post("actions/folderlist.php", {area: areaName, mode: "normal"},
 						function(data){
 							$.getScript("js/folderlist_script.js");
 							$("#folderlist_folders").html(data);
@@ -29,3 +29,5 @@
 </div>
 <div id="document_spacer"></div>
 <input type="hidden" id="document_last_id" />
+<div id="free-for-stuff">
+<div>

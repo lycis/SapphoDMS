@@ -30,6 +30,15 @@ $(function() {
 					}
 			);
 	}
+	
+	function addNewObject(){
+		$.post("actions/create_add_object_dlg.php",
+			   {area: $("#area_selection").val()},
+			   function (data){
+					$("#free-for-stuff").html(data);
+					$.getScript("js/add_new_object_dlg.js");
+			   });
+	}
 			
 	$("#fileview").treeview({ 
 								collapsed: true, 
@@ -40,6 +49,12 @@ $(function() {
 	$(".document_link").click(function(){
 		var item = $(this);
 		loadDocument(item.attr("document_id"));
+		return false;
+	});
+	$("#filetree-button-add-item").button();
+	$("#filetree-button-add-item").click(function(){
+		$("#fileview-dlg").remove();
+		addNewObject();
 		return false;
 	});
 });

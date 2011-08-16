@@ -50,8 +50,9 @@ $(function(){
 				{mode: "unlock", id: did}, 
 				function(data){
 					var data_array = data.split(";");
-					state_id = data[0];
-					msg      = data[1];
+					state_id = data_array[0];
+					msg      = data_array[1];
+
 					$("#document_content").html(msg);
 					if(state_id != "NOK")
 						loadDocument(parseInt(state_id));
@@ -61,21 +62,7 @@ $(function(){
 	}
 	
 	function doCancel(did){
-		$("#confirm-dialog").dialog({
-				resizable: false,
-				height: 200,
-				width: 400,
-				modal: true,
-				buttons: {
-					"Yes": function() {
-						$( this ).dialog( "close" );
-						unlockDocument(did);
-					},
-					"No": function() {
-						$( this ).dialog( "close" );
-					}
-				}
-			});
+		$("#confirm-dialog").dialog("open");
 		return true;
 	}
 	
@@ -111,4 +98,22 @@ $(function(){
 	});
 	$("#document_save").click(saveDocument);
 	$("#confirm-dialog").hide();
+	$("#confirm-dialog").dialog({
+		autoOpen: false,
+		resizable: false,
+		height: 200,
+		width: 400,
+		modal: true,
+		show: "explode",
+		hide: "explode",
+		buttons: {
+			"Yes": function() {
+				$(this ).dialog( "close" );
+				unlockDocument($("#document_id").val());
+			},
+			"No": function() {
+				$(this ).dialog( "close" );
+			}
+		}
+	});
 });
