@@ -15,13 +15,12 @@ $(function(){
 						type: $("#add-object-type").val(),
 						area: $("#area_selection").val()},
 					   function(data){
-							alert(data);
 							var data_array = data.split(";");
 							var state      = data_array[0];
 							var msg        = data_array[1];
 							
 							if(state == "NOK")
-								alert("Failure - ".msg);
+								alert("Failure - "+msg);
 							location.reload();
 					   });
 				$(this ).dialog( "close" );
