@@ -76,16 +76,32 @@ $(function(){
 		}
 		
 		$.post("actions/save_document.php",
-			   {id: did, content: instance.getData()},
+			   {id: $("#document_id").val(), 
+			    content: instance.getData()},
 			   function(data){
+					var data_array = data.split(";");
+					var state      = data_array[0];
+					var msg        = data_array[1];
+					
+					if(state == "NOK")
+						alert("Failure: "+msg);
+					else
+						alert(msg);
 			   });
 	}
 	
+	function showHistory(){
+		var did = $("#document_id").val();
+		$.post("actions/document.php",
+				{id: did, mode: "history"},
+				function(data){
+					$("#document_content").html(data);
+					$.getScript("js/load_history.js");
+				});
+	}
+	
 	$("input:button").button();
-	if($("#document_mode").val() == "read"){
-		$("#document_save").hide();
-		$("#document_cancel").hide();
-		}
+	
 	$("#document_edit").click(function(){
 		var item = $("#document_id");
 		editDocument(item.val());
@@ -116,4 +132,15 @@ $(function(){
 			}
 		}
 	});
+	$("#document_history").button();
+	$("#document_history").click(showHistory);
+	
+	if($("#document_mode").val() == "read"){
+		$("#document_save").hide();
+		$("#document_cancel").hide();
+	}
+	
+	if($("#document_mode").val() == "write"){
+		$("#document_edit").hide();
+	}
 });

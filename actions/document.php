@@ -9,12 +9,17 @@
 	
 	if($_POST["mode"] != "read" &&
 	   $_POST["mode"] != "write" &&
-	   $_POST["mode"] != "unlock") die("Error: invalid mode");
+	   $_POST["mode"] != "unlock" &&
+	   $_POST["mode"] != "history" &&
+	   $_POST["mode"] != "show_version") die("Error: invalid mode");
 	
 	// Get data
 	$request = "SELECT * FROM object WHERE object_id = ".$_POST["id"];
 	$result  = mysql_query($request) or die("Document does not exist. (ID = ".$_POST["id"].", MODE = ".$_POST["mode"].")");
 	$row     = mysql_fetch_assoc($result);
+	
+	if($_SESSION["uid"] == $row["object_locked_uid"] && $_POST["mode"] == "read")
+		$_POST["mode"] = "write";
 	
 	if($_POST["mode"] == "read")
 	{
@@ -50,8 +55,8 @@
 		$CKEditor->basePath = '/ckeditor/';
 
 		// Set global configuration (used by every instance of CKEditor).
-		$CKEditor->config['width'] = $_POST["width"];
-		$CKEditor->config['height'] = $_POST["height"];
+		if(isset($_POST["width"])) $CKEditor->config['width'] = $_POST["width"];
+		if(isset($_POST["height"])) $CKEditor->config['height'] = $_POST["height"];
 
 		// Change default textarea attributes.
 		$CKEditor->textareaAttributes = array("cols" => 80, "rows" => 20);
@@ -68,7 +73,7 @@
 		echo "   <p>Do you really want to cancel? If you do all unsaved changes to the document will be lost.</p>";
 		echo "</div>";
 	}
-	else if($_POST["mode"] = "unlock")
+	else if($_POST["mode"] == "unlock")
 	{
 		// Unlock record
 		check_record_lock($row);
@@ -84,6 +89,47 @@
 		
 		// return document id to AJAX
 		echo $_POST["id"].";Record unlocked.";
+	}
+	else if($_POST["mode"] == "history")
+	{
+		echo "<h3>History of ".$row["object_name"]."</h3>";
+		echo "<table><tr><td><input type=\"button\" value=\"show document\" id=\"document_show\"/></td></tr></table>";
+		echo "<table align=\"center\">";
+		echo "<tr><th>Version #</th><th>Versioned Time</th><th>User</th><th></th><th></th></tr>";
+		echo "<tr><td>current</td><td>latest</td><td></td>";
+		echo "<td></td></tr>";
+		
+		$request = "SELECT versioned_data_lnr, versioned_data_time, versioned_data_user ".
+                   "FROM versioned_data WHERE versioned_data_id = ".$row["object_id"].
+		           " ORDER BY versioned_data_lnr DESC";
+		$result  = mysql_query($request) or die("Could not get version data: ".mysql_error());
+		while($version = mysql_fetch_assoc($result)){
+		    $vnr = $version["versioned_data_lnr"];
+			$vtime = $version["versioned_data_time"];
+			
+			$vuser   = "???";
+			$request = "SELECT * FROM user WHERE user_uid = ".$version["versioned_data_user"];
+			$result  = mysql_query($request) or $vuser = "<unknown>";
+			if($vuser != "<unknown>"){
+				$user    = mysql_fetch_assoc($result);
+				$vuser   = $user["user_name"];
+			}
+			
+			echo "<tr><td>$vnr</td><td>$vtime</td><td>$vuser</td><td><input type=\"button\" value=\"show\" version=\"$vnr\" class=\"document_show_version\"/></td>";
+			echo "<td><input type=\"button\" value=\"restore\" version=\"$vnr\" class=\"document_restore_version\"/></td></tr>";
+		}
+		
+		print_hidden_fields();
+	}
+	else if($_POST["mode"] == "show_version")
+	{
+		if(!isset($_POST["version"])) die("No version to restore.");
+		
+		echo "<h3>".$row["object_name"]." (Version# ".$_POST["version"].")</h3>";
+		echo "<p>This is an archived version. You can not edit it.</p>";
+		echo "<hr/>";
+		echo getDocumentContentFromVersion($_POST["id"], $_POST["version"]);
+		echo "<hr/>";
 	}
 	
 	function getDocumentContent($did)
@@ -102,6 +148,24 @@
 		$row = mysql_fetch_assoc($result);
 		
 		return $row["object_data_text"];
+	}
+	
+	function getDocumentContentFromVersion($did, $version)
+	{
+		$request = "SELECT object_type FROM object WHERE object_id = $did";
+		$result  = mysql_query($request) or die("Error while loading versioned document: ".mysql_error());
+		if(mysql_num_rows($result) < 1) die("Requested version (Document# $did, Version# $version) does not exist.");
+		
+		$row = mysql_fetch_assoc($result);
+		$oid = $row["object_type"];
+		if($oid != "D") die("This document can't be displayed!");
+		
+		$request = "SELECT versioned_data_text FROM versioned_data WHERE versioned_data_id = $did AND versioned_data_lnr = $version";
+		$result  = mysql_query($request) or die("Error while loading versioned document data: ".mysql_error());
+		if(mysql_num_rows($result) < 1) die("Requested document (DOcument# $did, Version# $version) does not have any data.");
+		$row = mysql_fetch_assoc($result);
+		
+		return $row["versioned_data_text"];
 	}
 	
 	function rollback_die($text){
@@ -131,7 +195,13 @@
 		// Buttons
 		echo "<table><tr><td><input type=\"button\" value=\"edit\" id=\"document_edit\"/>";
 		echo "</td><td><input type=\"button\" value=\"save\" id=\"document_save\"/>";
-		echo "</td><td><input type=\"button\" value=\"cancel\" id=\"document_cancel\"/></td></tr></table>";
+		echo "</td><td><input type=\"button\" value=\"exit\" id=\"document_cancel\"/></td>";
+		echo "<td><input type=\"button\" value=\"show history\" id=\"document_history\"/></td></tr></table>";
+		
+		print_hidden_fields();
+	}
+	
+	function print_hidden_fields(){
 		echo "<input type=\"hidden\" id=\"document_mode\" value=\"".$_POST["mode"]."\"/>";
 		echo "<input type=\"hidden\" id=\"document_id\" value=\"".$_POST["id"]."\"/>";
 		echo "<input type=\"hidden\" id=\"document_cancel\" value=\"0\"/>";

@@ -3,14 +3,10 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Erstellungszeit: 15. August 2011 um 23:07
+-- Erstellungszeit: 18. August 2011 um 00:55
 -- Server Version: 5.5.8
 -- PHP-Version: 5.3.5
 
---
--- Sappho DMS Backend Database
--- Last Change: 2011-08-15
---
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT=0;
 START TRANSACTION;
@@ -30,8 +26,6 @@ START TRANSACTION;
 --
 -- Tabellenstruktur für Tabelle `area`
 --
--- Erzeugt am: 14. August 2011 um 17:23
---
 
 DROP TABLE IF EXISTS `area`;
 CREATE TABLE IF NOT EXISTS `area` (
@@ -46,8 +40,6 @@ CREATE TABLE IF NOT EXISTS `area` (
 --
 -- Tabellenstruktur für Tabelle `object`
 --
--- Erzeugt am: 14. August 2011 um 19:31
---
 
 DROP TABLE IF EXISTS `object`;
 CREATE TABLE IF NOT EXISTS `object` (
@@ -58,14 +50,12 @@ CREATE TABLE IF NOT EXISTS `object` (
   `object_parent` int(11) NOT NULL,
   `object_locked_uid` int(11) NOT NULL,
   PRIMARY KEY (`object_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=28 ;
 
 -- --------------------------------------------------------
 
 --
 -- Tabellenstruktur für Tabelle `object_data`
---
--- Erzeugt am: 15. August 2011 um 20:48
 --
 
 DROP TABLE IF EXISTS `object_data`;
@@ -81,8 +71,6 @@ CREATE TABLE IF NOT EXISTS `object_data` (
 --
 -- Tabellenstruktur für Tabelle `profile`
 --
--- Erzeugt am: 14. August 2011 um 15:08
---
 
 DROP TABLE IF EXISTS `profile`;
 CREATE TABLE IF NOT EXISTS `profile` (
@@ -96,8 +84,6 @@ CREATE TABLE IF NOT EXISTS `profile` (
 
 --
 -- Tabellenstruktur für Tabelle `user`
---
--- Erzeugt am: 14. August 2011 um 11:30
 --
 
 DROP TABLE IF EXISTS `user`;
@@ -114,13 +100,28 @@ CREATE TABLE IF NOT EXISTS `user` (
 --
 -- Tabellenstruktur für Tabelle `user_area`
 --
--- Erzeugt am: 14. August 2011 um 17:24
---
 
 DROP TABLE IF EXISTS `user_area`;
 CREATE TABLE IF NOT EXISTS `user_area` (
   `user_area_uid` int(11) NOT NULL,
   `user_area_aid` int(11) NOT NULL,
   PRIMARY KEY (`user_area_uid`,`user_area_aid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `versioned_data`
+--
+
+DROP TABLE IF EXISTS `versioned_data`;
+CREATE TABLE IF NOT EXISTS `versioned_data` (
+  `versioned_data_id` int(11) NOT NULL,
+  `versioned_data_lnr` int(11) NOT NULL,
+  `versioned_data_text` text NOT NULL,
+  `versioned_data_blob` blob NOT NULL,
+  `versioned_data_time` datetime NOT NULL,
+  `versioned_data_user` int(11) NOT NULL,
+  PRIMARY KEY (`versioned_data_id`,`versioned_data_lnr`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 COMMIT;

@@ -5,9 +5,9 @@ $(function() {
 		}
 					 
 	function loadDocument(did){
-		var old_id = $("#document_last_id").val();
-			if(old_id == did)
-				toggleDocument();
+		//var old_id = $("#document_last_id").val();
+		//	if(old_id == did)
+		//		toggleDocument();
 		 
 			$("#document_last_id").val(did);
 					 
@@ -45,7 +45,7 @@ $(function() {
 								animated: "fast"
 							});
 	$("#document_last_id").val(-1);
-	$("#document").hide();
+	//$("#document").hide();
 	$(".document_link").click(function(){
 		var item = $(this);
 		loadDocument(item.attr("document_id"));
