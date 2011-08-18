@@ -15,6 +15,9 @@
 
 SET AUTOCOMMIT=0;
 START TRANSACTION;
+-- --------------------------------------------------------
+--        D R O P    O L D    T A B L E S
+-- --------------------------------------------------------
 
 -- We start with dropping all existing tables
 DROP TABLE IF EXISTS area;
@@ -26,15 +29,15 @@ DROP TABLE IF EXISTS user_area;
 DROP TABLE IF EXISTS versioned_data;
 
 -- --------------------------------------------------------
--- now let's create our structure
+--            T A B L E    S T R U C T U R E
+-- --------------------------------------------------------
 
 -- Areas
 
 CREATE TABLE area (
    area_aid		INT(11)			NOT NULL	AUTO_INCREMENT,
    area_name	VARCHAR(255)	NOT NULL,
-  PRIMARY KEY (area_aid),
-  UNIQUE KEY area_name (area_name)
+  PRIMARY KEY (area_aid)
 );
 
 -- --------------------------------------------------------
@@ -81,8 +84,7 @@ CREATE TABLE user (
    user_uid 		INT(11) 		NOT NULL	AUTO_INCREMENT,
    user_name 		VARCHAR(30) 	NOT NULL,
    user_password 	VARCHAR(256)	NOT NULL,
-  PRIMARY KEY (user_uid),
-  UNIQUE KEY user_name (user_name)
+  PRIMARY KEY (user_uid)
 );
 
 -- --------------------------------------------------------
@@ -108,6 +110,15 @@ CREATE TABLE versioned_data (
    versioned_data_user INT(11)			NOT NULL,
   PRIMARY KEY (versioned_data_id, versioned_data_lnr)
 );
+
+
+-- --------------------------------------------------------
+--                 C O N S T R A I N T S
+-- --------------------------------------------------------
+
+-- unique keys
+ALTER TABLE area	ADD UNIQUE (area_name);
+ALTER TABLE user	ADD UNIQUE (user_name);
 
 -- End transaction
 COMMIT;

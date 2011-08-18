@@ -1,6 +1,7 @@
 -- Sappho Database Structure Definition
--- Postgre Version: 8.3
--- last update: 2011-08-18
+-- Database     : PostgreSQL
+-- Version      : 8.3
+-- last update  : 2011-08-18
 
 -- 
 -- Database has to exist before applying this script!
@@ -14,6 +15,8 @@
 BEGIN;
 
 -- --------------------------------------------------------
+--        D R O P    O L D    T A B L E S
+-- --------------------------------------------------------
 
 -- We start with dropping all existing tables
 DROP TABLE IF EXISTS area;
@@ -25,14 +28,15 @@ DROP TABLE IF EXISTS user_area;
 DROP TABLE IF EXISTS versioned_data;
 
 -- --------------------------------------------------------
--- now let's create our structure
+--            T A B L E    S T R U C T U R E
+-- --------------------------------------------------------
+
 -- Areas
 
 CREATE TABLE area (
    area_aid	SERIAL 			NOT NULL,
    area_name VARCHAR(255) 	NOT NULL,
-  PRIMARY KEY (area_aid),
-  UNIQUE (area_name)
+  PRIMARY KEY (area_aid)
 );
 
 -- --------------------------------------------------------
@@ -78,8 +82,7 @@ CREATE TABLE "user" (
    user_uid 		SERIAL 			NOT NULL,
    user_name 		VARCHAR(30) 	NOT NULL,
    user_password	VARCHAR(256) 	NOT NULL,
-  PRIMARY KEY (user_uid),
-  UNIQUE (user_name)
+  PRIMARY KEY (user_uid)
 );
 
 -- --------------------------------------------------------
@@ -105,6 +108,14 @@ CREATE TABLE versioned_data (
    versioned_data_user	INTEGER 		NOT NULL,
   PRIMARY KEY (versioned_data_id, versioned_data_lnr)
 );
+
+-- --------------------------------------------------------
+--                 C O N S T R A I N T S
+-- --------------------------------------------------------
+
+-- unique keys
+ALTER TABLE area	ADD UNIQUE (area_name);
+ALTER TABLE "user"	ADD UNIQUE (user_name);
 
 -- End transaction
 COMMIT;
