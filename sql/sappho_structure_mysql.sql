@@ -74,7 +74,7 @@ CREATE TABLE profile (
    profile_firstname	VARCHAR(255) 	NOT NULL,
    profile_lastname		VARCHAR(255) 	NOT NULL,
   PRIMARY KEY (profile_uid)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+);
 
 -- --------------------------------------------------------
 
@@ -117,8 +117,25 @@ CREATE TABLE versioned_data (
 -- --------------------------------------------------------
 
 -- unique keys
-ALTER TABLE area	ADD UNIQUE (area_name);
-ALTER TABLE user	ADD UNIQUE (user_name);
+ALTER TABLE area ADD UNIQUE (area_name);
+
+ALTER TABLE user ADD UNIQUE (user_name);
+
+-- foreign keys
+ALTER TABLE object_data	ADD FOREIGN KEY (object_data_id)
+  REFERENCES object(object_id) ON DELETE CASCADE;
+  
+ALTER TABLE profile ADD FOREIGN KEY (profile_uid) REFERENCES user(user_uid)
+  ON DELETE CASCADE;
+  
+ALTER TABLE user_area ADD FOREIGN KEY (user_area_uid) REFERENCES user(user_uid)
+  ON DELETE CASCADE;
+  
+ALTER TABLE	user_area ADD FOREIGN KEY (user_area_aid) REFERENCES area(area_aid)
+  ON DELETE CASCADE;
+  
+ALTER TABLE versioned_data ADD FOREIGN KEY(versioned_data_id) 
+  REFERENCES object_data(object_data_id) ON DELETE CASCADE;
 
 -- End transaction
 COMMIT;
