@@ -58,9 +58,11 @@ CREATE TABLE object (
 -- Object Data
 
 CREATE TABLE object_data (
-   object_data_id		INTEGER 			NOT NULL,
-   object_data_text		TEXT			NOT NULL,
-   object_data_blob		VARCHAR(255) 	NOT NULL,
+   object_data_id			INTEGER 		NOT NULL,
+   object_data_text			TEXT			NOT NULL,
+   object_data_blob			VARCHAR(255) 	NOT NULL,
+   object_data_last_change	TIMESTAMP		NOT NULL,
+   object_data_last_user 	INTEGER		NOT NULL,
   PRIMARY KEY (object_data_id)
 );
 
