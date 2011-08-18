@@ -1,5 +1,5 @@
 -- Sappho Database Structure Definition
--- Database     : MySQL
+-- Database     : MySQL with InnoDB
 -- Version      : 5.1.41
 -- last update  : 2011-08-18
 
@@ -38,7 +38,7 @@ CREATE TABLE area (
    area_aid		INT(11)			NOT NULL	AUTO_INCREMENT,
    area_name	VARCHAR(255)	NOT NULL,
   PRIMARY KEY (area_aid)
-);
+) ENGINE = InnoDB;
 
 -- --------------------------------------------------------
 
@@ -52,7 +52,7 @@ CREATE TABLE object (
    object_parent		INT(11) 		NOT NULL,
    object_locked_uid	INT(11) 		NOT NULL,
   PRIMARY KEY (object_id)
-);
+) ENGINE = InnoDB;
 
 -- --------------------------------------------------------
 
@@ -63,7 +63,7 @@ CREATE TABLE object_data (
    object_data_text	TEXT 			NOT NULL,
    object_data_blob VARCHAR(256) 	NOT NULL,
   PRIMARY KEY (object_data_id)
-);
+) ENGINE = InnoDB;
 
 -- --------------------------------------------------------
 
@@ -74,7 +74,7 @@ CREATE TABLE profile (
    profile_firstname	VARCHAR(255) 	NOT NULL,
    profile_lastname		VARCHAR(255) 	NOT NULL,
   PRIMARY KEY (profile_uid)
-);
+) ENGINE = InnoDB;
 
 -- --------------------------------------------------------
 
@@ -85,7 +85,7 @@ CREATE TABLE user (
    user_name 		VARCHAR(30) 	NOT NULL,
    user_password 	VARCHAR(256)	NOT NULL,
   PRIMARY KEY (user_uid)
-);
+) ENGINE = InnoDB;
 
 -- --------------------------------------------------------
 
@@ -95,7 +95,7 @@ CREATE TABLE user_area (
    user_area_uid	INT(11)		NOT NULL,
    user_area_aid	INT(11)		NOT NULL,
   PRIMARY KEY (user_area_uid, user_area_aid)
-);
+) ENGINE = InnoDB;
 
 -- --------------------------------------------------------
 
@@ -109,7 +109,7 @@ CREATE TABLE versioned_data (
    versioned_data_time	DATETIME		NOT NULL,
    versioned_data_user INT(11)			NOT NULL,
   PRIMARY KEY (versioned_data_id, versioned_data_lnr)
-);
+) ENGINE = InnoDB;
 
 
 -- --------------------------------------------------------
