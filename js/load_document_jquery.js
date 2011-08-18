@@ -79,6 +79,7 @@ $(function(){
 			   {id: $("#document_id").val(), 
 			    content: instance.getData()},
 			   function(data){
+					alert(data);
 					var data_array = data.split(";");
 					var state      = data_array[0];
 					var msg        = data_array[1];

@@ -85,7 +85,7 @@
 		
 		$freq = "SELECT * FROM object WHERE object_areaid = ".$area_id." AND object_parent = $folder_id ORDER BY object_name";
 		$fres = mysql_query($freq) or die("Could not retrieve items in folder $folder_id");
-		while($frow = mysql_fetch_assoc($fres)){
+		while($frow = mysql_fetch_assoc($fres)){		
 			echo "<li>";
 			if($frow["object_type"] == "F")
 				dive_into_folder($frow["object_id"], $area_id);

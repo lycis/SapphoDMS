@@ -18,7 +18,8 @@
 	if($object["object_type"] == "D")
 	{
 		insert_versioned_record($object);
-		$request = "UPDATE object_data SET object_data_text = '".$_POST["content"]."' WHERE object_data_id = ".$_POST["id"];
+		$request = "UPDATE object_data SET object_data_text = '".$_POST["content"]."', object_data_last_change = ".
+                   "FROM_UNIXTIME(".time()."), object_data_last_user = ".$_SESSION["uid"]." WHERE object_data_id = ".$_POST["id"];
 	}
 	else
 		die("NOK;You can not change this type of document!");
@@ -48,7 +49,8 @@
 		
 		if($object["object_type"] = "D")
 			$request = "INSERT INTO versioned_data(versioned_data_lnr, versioned_data_text, versioned_data_id, versioned_data_time, versioned_data_user) ".
-			           "VALUES($vlnr, '".$object_data["object_data_text"]."', ".$object["object_id"].", FROM_UNIXTIME(".time()."), ".$_SESSION["uid"].")";
+			           "VALUES($vlnr, '".$object_data["object_data_text"]."', ".$object["object_id"].", FROM_UNIXTIME(".time()."), ".
+					   $object_data["object_data_last_user"].")";
 		else
 			die("NOK;You can not change this type of document!");
 		

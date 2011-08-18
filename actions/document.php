@@ -92,11 +92,23 @@
 	}
 	else if($_POST["mode"] == "history")
 	{
+		$request = "SELECT object_data_last_change, object_data_last_user FROM object_data WHERE object_data_id = ".$row["object_id"];
+		$result  = mysql_query($request) or die("Could not get the documents latest change data.");
+		$change  = mysql_fetch_assoc($result);
+		
+		$username = "???";
+		$request = "SELECT user_name FROM user WHERE user_uid = ".$change["object_data_last_user"];
+		$result  = mysql_query($request) or $username = "<unknown>";
+		if($username != "<unknown>"){
+			$user    = mysql_fetch_assoc($result);
+			$username = $user["user_name"];
+		}
+		
 		echo "<h3>History of ".$row["object_name"]."</h3>";
 		echo "<table><tr><td><input type=\"button\" value=\"show document\" id=\"document_show\"/></td></tr></table>";
 		echo "<table align=\"center\">";
 		echo "<tr><th>Version #</th><th>Versioned Time</th><th>User</th><th></th><th></th></tr>";
-		echo "<tr><td>current</td><td>latest</td><td></td>";
+		echo "<tr><td>current</td><td>".$change["object_data_last_change"]."</td><td>$username</td>";
 		echo "<td></td></tr>";
 		
 		$request = "SELECT versioned_data_lnr, versioned_data_time, versioned_data_user ".
@@ -108,10 +120,10 @@
 			$vtime = $version["versioned_data_time"];
 			
 			$vuser   = "???";
-			$request = "SELECT * FROM user WHERE user_uid = ".$version["versioned_data_user"];
-			$result  = mysql_query($request) or $vuser = "<unknown>";
+			$urequest = "SELECT * FROM user WHERE user_uid = ".$version["versioned_data_user"];
+			$uresult  = mysql_query($urequest) or $vuser = "<unknown>";
 			if($vuser != "<unknown>"){
-				$user    = mysql_fetch_assoc($result);
+				$user    = mysql_fetch_assoc($uresult);
 				$vuser   = $user["user_name"];
 			}
 			
@@ -162,7 +174,7 @@
 		
 		$request = "SELECT versioned_data_text FROM versioned_data WHERE versioned_data_id = $did AND versioned_data_lnr = $version";
 		$result  = mysql_query($request) or die("Error while loading versioned document data: ".mysql_error());
-		if(mysql_num_rows($result) < 1) die("Requested document (DOcument# $did, Version# $version) does not have any data.");
+		if(mysql_num_rows($result) < 1) die("Requested document (Document# $did, Version# $version) does not have any data.");
 		$row = mysql_fetch_assoc($result);
 		
 		return $row["versioned_data_text"];
@@ -189,8 +201,22 @@
 	}
 	
 	function print_default_header($row){
+		$request = "SELECT object_data_last_change, object_data_last_user FROM object_data WHERE object_data_id = ".$row["object_id"];
+		$result  = mysql_query($request) or die("Error while retrieving last change data: ".mysql_error());
+		$change  = mysql_fetch_assoc($result);
+		
+		$username = "???";
+		$request = "SELECT user_name FROM user WHERE user_uid = ".$change["object_data_last_user"];
+		$result  = mysql_query($request) or $username = "<unknown>";
+		if($username != "<unknown>"){
+			$user    = mysql_fetch_assoc($result);
+			$username = $user["user_name"];
+		}
+		
+		
 		// Caption
 		echo "<h3>".$row["object_name"]."</h3>";
+		echo "<p>Last change at ".$change["object_data_last_change"]." by $username</p>";
 	
 		// Buttons
 		echo "<table><tr><td><input type=\"button\" value=\"edit\" id=\"document_edit\"/>";
