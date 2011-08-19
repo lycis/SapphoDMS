@@ -48,9 +48,9 @@
 		$object_data = mysql_fetch_assoc($result);
 		
 		if($object["object_type"] = "D")
-			$request = "INSERT INTO versioned_data(versioned_data_lnr, versioned_data_text, versioned_data_id, versioned_data_time, versioned_data_user) ".
-			           "VALUES($vlnr, '".$object_data["object_data_text"]."', ".$object["object_id"].", FROM_UNIXTIME(".time()."), ".
-					   $object_data["object_data_last_user"].")";
+			$request = "INSERT INTO versioned_data(versioned_data_lnr, versioned_data_id, versioned_data_text, versioned_data_time, versioned_data_user) ".
+			           "(SELECT $vlnr, ".$object["object_id"].", object_data_text, object_data_last_change, object_data_last_user FROM object_data ".
+					   "WHERE object_data_id = ".$object["object_id"].")";
 		else
 			die("NOK;You can not change this type of document!");
 		
