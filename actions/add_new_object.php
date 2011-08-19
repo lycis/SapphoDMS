@@ -30,7 +30,8 @@
 	
 	if($_POST["type"] == "D")
 	{
-		$request = "INSERT INTO object_data(object_data_id, object_data_text) VALUES($oid, '')";
+		$request = "INSERT INTO object_data(object_data_id, object_data_text, object_data_last_change, object_data_last_user) ".
+		           "VALUES($oid, '', FROM_UNIXTIME(".time()."), ".$_SESSION["uid"].")";
 		$result  = mysql_query($request) or 
 			die("NOK;Document was created, but the System was not able to create an object data record!");
 	}

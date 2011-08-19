@@ -19,13 +19,14 @@ BEGIN;
 -- --------------------------------------------------------
 
 -- We start with dropping all existing tables
-DROP TABLE IF EXISTS area;
-DROP TABLE IF EXISTS object;
+DROP TABLE IF EXISTS versioned_data;
+DROP TABLE IF EXISTS user_area;
 DROP TABLE IF EXISTS object_data;
+DROP TABLE IF EXISTS object;
+DROP TABLE IF EXISTS area;
 DROP TABLE IF EXISTS profile;
 DROP TABLE IF EXISTS "user";
-DROP TABLE IF EXISTS user_area;
-DROP TABLE IF EXISTS versioned_data;
+
 
 -- --------------------------------------------------------
 --            T A B L E    S T R U C T U R E
