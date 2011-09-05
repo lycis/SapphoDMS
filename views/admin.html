@@ -83,49 +83,61 @@
 		$("#submit_delete_area").click(deleteArea);
 		$("#submit_add_area").click(addArea);
 		$("#associate_user_name").change(userAreaChange);
+		$("#accordion").accordion({collapsible: true, active: false, autoHeight: false});
 	});
 </script>
 
 <!-- LAYOUT -->
 <div id="admin_panel">
-	<h3>Create user</h3>
-	<div id="create_user_box">
+	<div id="accordion">
+		<h3><a href="#">Create user</a></h3>
+		<div>
+			<div id="create_user_box">
+				<table>
+				<form>
+					<tr><th>Username</th><td><input type="text" id="new_user_name"/></td></tr>
+					<tr><th>Password</th><td><input type="password" id="new_user_password"/></td></tr>
+					<tr><td><input type="button" value="create" id="submit_new_user"/></td><td><input type="reset" value="clear"/></td></tr>
+				</form>
+				</table>
+			</div>
+		</div>
+
+		
+		<h3><a href="#">Associate User to Area</a></h3>
+		<div>
 		<table>
-			<form>
-				<tr><th>Username</th><td><input type="text" id="new_user_name"/></td></tr>
-				<tr><th>Password</th><td><input type="password" id="new_user_password"/></td></tr>
-				<tr><td><input type="button" value="create" id="submit_new_user"/></td><td><input type="reset" value="clear"/></td></tr>
-			</form>
+			<tr align="center"><td colspan="3">
+				<select id="associate_user_name">
+					<option>-- no user --</option>
+					<?php
+						$request = "SELECT user_name FROM user";
+						$result  = mysql_query($request) or die("Could not get list of users.");
+						while($row = mysql_fetch_assoc($result)){
+							echo "<option>".$row["user_name"]."</option>";
+						}
+					?>
+				</select>
+			</td></tr>
+			<tr><th>Associated</th><td></td><th>Not Associated</th></tr>
+			<tr id="associated_selections"></tr>
 		</table>
+		</div>
+		
+		<h3><a href="#">Document Areas</a></h3>
+		<div>
+			<table>
+				<tr><th>Delete Area:</th><td><select id="delete_area_item">
+					<?php
+						$request = "SELECT area_name FROM area";
+						$result  = mysql_query($request) or die("Could not get area data.");
+						while($row = mysql_fetch_assoc($result)){
+							echo "<option>".$row["area_name"]."</option>";
+						}
+					?>
+				</select</td><td><input type="button" value="delete" id="submit_delete_area"/></td></tr>
+			<tr><th>Add area</th><td><input type="text" id="add_area_name"/></td><td><input type="button" value="add" id="submit_add_area"/></td></tr>
+		</table>
+		</div>
 	</div>
-	<h3>Associate User to Area</h3>
-	<script id="assoc_script">
-	</script>
-	<table>
-		<tr align="center"><td colspan="3">
-			<select id="associate_user_name">
-				<option>-- no user --</option>
-				<?php
-					$request = "SELECT user_name FROM user";
-					$result  = mysql_query($request) or die("Could not get list of users.");
-					while($row = mysql_fetch_assoc($result)){
-						echo "<option>".$row["user_name"]."</option>";
-					}
-				?>
-			</select>
-		</td></tr>
-		<tr><th>Associated</th><td></td><th>Not Associated</th></tr>
-		<tr id="associated_selections"></tr>
-	</table>
-	<h3>Document Areas</h3>
-	<table>
-		<tr><th>Delete Area:</th><td><select id="delete_area_item"><?php
-													$request = "SELECT area_name FROM area";
-													$result  = mysql_query($request) or die("Could not get area data.");
-													while($row = mysql_fetch_assoc($result)){
-														echo "<option>".$row["area_name"]."</option>";
-													}
-												?></select</td><td><input type="button" value="delete" id="submit_delete_area"/></td></tr>
-		<tr><th>Add area</th><td><input type="text" id="add_area_name"/></td><td><input type="button" value="add" id="submit_add_area"/></td></tr>
-	</table>
 </div>
