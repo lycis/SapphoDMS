@@ -42,7 +42,7 @@
 	echo "</span>";
 	echo "<ul>";
 	
-	$request = "SELECT * FROM object WHERE object_areaid = $area_id AND object_parent = 0 ORDER BY object_name";
+	$request = "SELECT * FROM object WHERE object_areaid = $area_id AND object_parent = 0 AND object_deleted = 'N' ORDER BY object_name";
 	$result  = mysql_query($request) or die("Error retrieving object data! ".mysql_error());
 	while($row = mysql_fetch_assoc($result)){
 		echo "<li>";
@@ -83,7 +83,7 @@
 		echo "</span>";
 		echo		"<ul>";
 		
-		$freq = "SELECT * FROM object WHERE object_areaid = ".$area_id." AND object_parent = $folder_id ORDER BY object_name";
+		$freq = "SELECT * FROM object WHERE object_areaid = ".$area_id." AND object_parent = $folder_id AND object_deleted = 'N' ORDER BY object_name";
 		$fres = mysql_query($freq) or die("Could not retrieve items in folder $folder_id");
 		while($frow = mysql_fetch_assoc($fres)){		
 			echo "<li>";
@@ -93,7 +93,7 @@
 				echo "<span class=\"file\"><a href=\"#\" class=\"$documentclass\" document_id=\"".$frow["object_id"]."\">".$frow["object_name"]."</a></span>";
 			echo "</li>";
 		}
-		echo "</ul></li>";
+		//echo "</ul></li>";
 		echo		"</ul>";
 		echo "</li>";
 	}

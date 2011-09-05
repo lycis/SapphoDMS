@@ -47,10 +47,11 @@ CREATE TABLE area (
 CREATE TABLE object (
    object_id 			SERIAL 			NOT NULL,
    object_type			VARCHAR(1)		NOT NULL,
-   object_name			VARCHAR(255) 	NOT NULL,
+   object_name			VARCHAR(255) 	NOT NULL	DEFAULT '<no name>',
    object_areaid		INTEGER 		NOT NULL,
    object_parent		INTEGER 		NOT NULL,
    object_locked_uid  	INTEGER 		NOT NULL,
+   object_deleted		VARCHAR(1)		NOT NULL	DEFAULT 'N',
   PRIMARY KEY (object_id)
 );
 
@@ -60,8 +61,8 @@ CREATE TABLE object (
 
 CREATE TABLE object_data (
    object_data_id			INTEGER 		NOT NULL,
-   object_data_text			TEXT			NOT NULL,
-   object_data_blob			VARCHAR(255) 	NOT NULL,
+   object_data_text			TEXT			NOT NULL	DEFAULT '',
+   object_data_blob			VARCHAR(255) 	NOT NULL	DEFAULT '',
    object_data_last_change	TIMESTAMP		NOT NULL,
    object_data_last_user 	INTEGER		NOT NULL,
   PRIMARY KEY (object_data_id)

@@ -61,6 +61,7 @@
 		
 		function userAreaChange(){
 			var username = this.value;
+			if(username == "-- no user --") return;
 			$.post("actions/mod_user_area_assoc.php",
 				   {user: username},
 				   function(data){
