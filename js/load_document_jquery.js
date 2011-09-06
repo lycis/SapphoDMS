@@ -100,6 +100,35 @@ $(function(){
 				});
 	}
 	
+	function deleteDocument(){
+		$("#free-for-stuff").html("<p>Do you really want do delete this document?</p>");
+		$("#free-for-stuff").dialog({
+			title: "Delete document",
+			resizable: false,
+			height: 170,
+			width: 350,
+			modal: true,
+			show: "explode",
+			hide: "explode",
+			buttons:{
+				"Yes": function(){
+					$.post("actions/delete_object.php",
+				       {oid: $("#document_id").val()},
+					   function(data){
+							var data_array = data.split(";");
+							var state      = data_array[0];
+							var msg        = data_array[1];
+							
+							if(state == "NOK")
+								alert("Failure - "+msg);
+							location.reload();
+					   });
+				},
+				"No": function(){$(this ).dialog( "close" );}
+			}
+		});
+	}
+	
 	$("input:button").button();
 	
 	$("#document_edit").click(function(){
@@ -142,6 +171,7 @@ $(function(){
 	
 	if($("#document_mode").val() == "write"){
 		$("#document_edit").hide();
+		$("#document_delete").click(deleteDocument);
 	}
 	
 	if($("#document_mode").val() == "read"){
