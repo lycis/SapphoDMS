@@ -39,22 +39,35 @@ $(function() {
 					$.getScript("js/add_new_object_dlg.js");
 			   });
 	}
+	
+	function showDeleteDialog(){
+		$.post("actions/create_delete_object_dlg.php",
+				{area: $("#area_selection").val()},
+				function(data){
+					$("#free-for-stuff").html(data);
+					$.getScript("js/delete_object_dialog.js");
+				});
+	}
 			
 	$("#fileview").treeview({ 
 								collapsed: true, 
 								animated: "fast"
 							});
 	$("#document_last_id").val(-1);
-	//$("#document").hide();
+	
 	$(".document_link").click(function(){
 		var item = $(this);
 		loadDocument(item.attr("document_id"));
 		return false;
 	});
+	
 	$("#filetree-button-add-item").button();
 	$("#filetree-button-add-item").click(function(){
 		$("#fileview-dlg").remove();
 		addNewObject();
 		return false;
 	});
+	
+	$("#filetree-button-delete-item").button();
+	$("#filetree-button-delete-item").click(showDeleteDialog);
 });

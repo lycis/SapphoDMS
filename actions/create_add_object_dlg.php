@@ -8,7 +8,7 @@
 	echo "        <th>Type:</th><td><select id=\"add-object-type\"><option value=\"F\">Folder</option><option value=\"D\">Document</option></select></td></tr>";
 	echo "    <tr><th colspan=\"2\">Choose parent folder</th></tr>";
 	echo "    <tr><td colspan=\"2\">";
-	$_POST["mode"] = "dialog";
+	$_POST["mode"] = "add-dialog";
 	include "folderlist.php";
 	echo "   </td></tr>";
 	echo "   <tr><th>Selected Parent:</th><td><div id=\"add-object-parent-label\"></div></td></tr>";

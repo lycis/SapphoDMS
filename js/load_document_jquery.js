@@ -143,4 +143,8 @@ $(function(){
 	if($("#document_mode").val() == "write"){
 		$("#document_edit").hide();
 	}
+	
+	if($("#document_mode").val() == "read"){
+		$("#document_delete").hide();
+	}
 });

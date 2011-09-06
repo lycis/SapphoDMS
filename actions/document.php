@@ -219,9 +219,10 @@
 		echo "<p>Last change at ".$change["object_data_last_change"]." by $username</p>";
 	
 		// Buttons
-		echo "<table><tr><td><input type=\"button\" value=\"edit\" id=\"document_edit\"/>";
-		echo "</td><td><input type=\"button\" value=\"save\" id=\"document_save\"/>";
-		echo "</td><td><input type=\"button\" value=\"exit\" id=\"document_cancel\"/></td>";
+		echo "<table><tr><td><input type=\"button\" value=\"edit\" id=\"document_edit\"/></td>";
+		echo "<td><input type=\"button\" value=\"delete\" id=\"document_delete\"/></td>";
+		echo "<td><input type=\"button\" value=\"save\" id=\"document_save\"/></td>";
+		echo "<td><input type=\"button\" value=\"exit\" id=\"document_cancel\"/></td>";
 		echo "<td><input type=\"button\" value=\"show history\" id=\"document_history\"/></td></tr></table>";
 		
 		print_hidden_fields();
