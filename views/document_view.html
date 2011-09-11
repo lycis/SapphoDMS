@@ -2,7 +2,11 @@
 <script>
 	$(function(){
 			function areaChanged(){
-				var areaName = this.value;
+				var areaName = $("#area_selection").val();
+				doAreaChange(areaName);
+			}
+			
+			function doAreaChange(areaName){
 				$.post("actions/folderlist.php", {area: areaName, mode: "normal"},
 						function(data){
 							$.getScript("js/folderlist_script.js");
@@ -12,6 +16,8 @@
 			}
 			
 			$("#area_selection").change(areaChanged);
+			if($("#area_selection").val() != "-- no area --")
+				areaChanged();
 		}
 	);
 </script>
