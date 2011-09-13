@@ -130,7 +130,6 @@
 	function getDocumentContentFromVersion($did, $version)
 	{
 		global $db;
-		
 		if($db->select('object', 'object_type', "object_id = $did"))
 			die("Error while loading versioned document: ".mysql_error());
 		$row = $db->nextData() or die("Requested version (Document# $did, Version# $version) does not exist.");
@@ -139,7 +138,8 @@
 		if($oid != "D") die("This document can't be displayed!");
 		
 		$request = "SELECT versioned_data_text FROM versioned_data WHERE versioned_data_id = $did AND versioned_data_lnr = $version";
-		if($db->select('versioned_data', 'versioned_data_text', "versioned_data_id = $did"))
+		if($db->select('versioned_data', 'versioned_data_text', 
+		               "versioned_data_id = $did AND versioned_data_lnr = $version"))
 			die("Error while loading versioned document data: ".mysql_error());
 		$row = $db->nextData() or die("Requested document (Document# $did, Version# $version) does not have any data.");
 		
