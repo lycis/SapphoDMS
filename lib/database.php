@@ -38,6 +38,10 @@ class DatabaseConnection{
 	const db_next_nodata = 1;
 	const db_next_error  = 2;
 	
+	// error codes for close()
+	const db_close_not_connected = 1;
+	const db_close_not_closed    = 2;
+	
 	// general error codes
 	const db_error_wrong_dtype = 255;
 	
@@ -53,6 +57,12 @@ class DatabaseConnection{
 		if(isset($user)) $this->db_user = $user;
 		if(isset($db))   $this->db_name = $db;
 	}
+	
+	function __destruct()
+	{
+		if($this->status == 'connected')
+			$this->close();
+	}
 		
 	// connect to database
 	function connect($password)
@@ -63,17 +73,17 @@ class DatabaseConnection{
 		   $this->db_user == '' ||
 		   $this->db_name == ''  ) return self::db_connect_missing_data;
 		   
-		$db_handle = 0;
+		$this->db_handle = 0;
 		if($this->typeIs('mysql'))
-			$db_handle = mysql_connect($this->db_host,$this->db_user,$password);
+			$this->db_handle = mysql_connect($this->db_host,$this->db_user,$password);
 		
-		if(!$db_handle)
+		if(!$this->db_handle)
 		{
 			$this->error_message = $this->getSQLError();
 			return self::db_connect_declined;
 		}
 		
-		$status = 'connected';
+		$this->status = 'connected';
 		 
 		if(!mysql_select_db($this->db_name))
 		{
@@ -205,9 +215,27 @@ class DatabaseConnection{
 		return false;
 	}
 	
+	// set level for debug messages
 	function setDebug($debug)
 	{
 		$this->debug_level = $debug;
+	}
+	
+	// close an former established connection
+	function close()
+	{
+		if($this->status != 'connected')
+			return self::db_close_not_connected;
+			
+		if($this->typeIs('mysql'))
+			if(!mysql_close($this->db_handle))
+			{
+				$this->error_message = 'Connection remains unclosed: '.mysql_error();
+				return self::db_close_not_closed;
+			}
+		
+		$this->status = 'unconnected';
+		return 0;
 	}
 }
 ?>

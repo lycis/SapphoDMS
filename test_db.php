@@ -32,4 +32,11 @@
 	if($exec) die("error - $exec: ".$db->lastError());
 	$object = $db->nextData() or die("error: ".$db->lastError());
 	echo "</p>";
+	
+	echo "<h3>close connection</h3>";
+	echo "<p>";
+	$r = $db->close();
+	if($r) die("error - $r: ".$db->lastError());
+	echo "connection closed.";
+	echo "</p>";
 ?>
