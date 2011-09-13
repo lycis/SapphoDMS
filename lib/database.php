@@ -127,6 +127,27 @@ class DatabaseConnection{
 		return 0;
 	}
 	
+	// execute given statement on database - use at own risk, no optimization done!
+	function execute($stmnt)
+	{
+		if($this->typeIs('mysql'))
+		{
+			$this->setLastQuery($stmnt);
+			
+			$result = 0;
+			$result = mysql_query($stmnt);
+			
+			if(!$result)
+			{
+				$this->error_message = $this->getSQLError();
+				return 1;
+			}
+			
+			$this->lastResult = $result;
+			return 0;
+		}
+	}
+	
 	// insert into database
 	function insert($table, $fields)
 	{

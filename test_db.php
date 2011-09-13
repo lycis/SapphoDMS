@@ -25,4 +25,11 @@
 	if($select) die("error - $select: ".$db->lastError());
 	$object = $db->nextData() or die("error: ".$db->lastError());
 	echo "</p>";
+	
+	echo "<h3>execute</h3>";
+	echo "<p>";
+	$exec = $db->execute("select * from object");
+	if($exec) die("error - $exec: ".$db->lastError());
+	$object = $db->nextData() or die("error: ".$db->lastError());
+	echo "</p>";
 ?>
