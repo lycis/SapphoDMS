@@ -21,7 +21,7 @@
 	
 	echo "<h3>select with WHERE clause</h3>";
 	echo "<p>";
-	$select = $db->select('object', array('*'), 'object_id = 1');
+	$select = $db->select('object', '*', 'object_id = 1');
 	if($select) die("error - $select: ".$db->lastError());
 	$object = $db->nextData() or die("error: ".$db->lastError());
 	echo "</p>";

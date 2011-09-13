@@ -6,6 +6,7 @@
 	$db_password = "test123";
 	$db_name     = "sappho";
 	$db_host     = "localhost";
+	$db_type     = "mysql";
 	
 	/*
 	 * Site Configuration

@@ -35,8 +35,7 @@ class DatabaseConnection{
 	const db_select_nodata = 2;
 	
 	// error codes for nextData()
-	const db_next_nodata = 1;
-	const db_next_error  = 2;
+	const db_next_nodata = false;
 	
 	// error codes for close()
 	const db_close_not_connected = 1;
@@ -95,22 +94,27 @@ class DatabaseConnection{
 	}
 	
 	// select from database
-	function select($table, $fields = array('*'), $where = '')
+	function select($table, $fields = '*', $where = '')
 	{
-		if(!is_array($fields)) return self::db_error_wrong_dtype;
+		//if(!is_array($fields)) return self::db_error_wrong_dtype;
 		
 		$query = '';
 		if($this->db_type == 'mysql')
 		{
 			$query = 'SELECT ';
-			for($i=0; $i < count($fields); $i++)
+			if(is_array($fields))
 			{
-			  $f = mysql_real_escape_string($fields[$i]);
-			  $query .= $f;
+				for($i=0; $i < count($fields); $i++)
+				{
+				$f = mysql_real_escape_string($fields[$i]);
+				$query .= $f;
 			  
-			  if($i != count($fields)-1)
-				$query .= ', ';
+				if($i != count($fields)-1)
+					$query .= ', ';
+				}
 			}
+			else
+				$query .= $fields;
 			
 			$query .= " FROM $table";
 			
@@ -174,14 +178,14 @@ class DatabaseConnection{
 		if($this->typeIs('mysql'))
 			$data = mysql_fetch_assoc($this->lastResult);
 			
+		if($this->debug_level > 1)
+			print_r($data);
+			
 		if(!$data)
 		{
 			$this->lastError = $this->getSQLError();
-			return self::db_next_error;
+			return self::db_next_nodata;
 		}
-		
-		if($this->debug_level > 1)
-			print_r($data);
 		
 		return $data;
 	}
@@ -236,6 +240,21 @@ class DatabaseConnection{
 		
 		$this->status = 'unconnected';
 		return 0;
+	}
+	
+	// get rows of result
+	function rowCount()
+	{
+		if(!$this->lastResult) return 0;
+		if($this->typeIs('mysql'))
+			return mysql_num_rows($this->lastResult);
+		return 0;
+	}
+	
+	// get the result handle of the last query
+	function getLastResult()
+	{
+		return $this->lastResult;
 	}
 }
 ?>

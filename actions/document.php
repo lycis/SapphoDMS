@@ -1,8 +1,11 @@
 <?php
 	session_start();
 	include("../config.php");
-	$db_conn = mysql_connect($db_host,$db_user,$db_password) or die("The database host is not available!");
-	mysql_select_db($db_name) or die("The database is not accessible!");
+	include("../lib/database.php");
+	
+	global $db;
+	$db = new DatabaseConnection($db_type, $db_host, $db_name, $db_user);
+	if($db->connect($db_password)) die("database error: ".$db->lastError());
 	
 	if(!isset($_POST["id"])) die("Error: No document!");
 	if(!isset($_POST["mode"])) die("Error: No mode!");
@@ -14,9 +17,9 @@
 	   $_POST["mode"] != "show_version") die("Error: invalid mode");
 	
 	// Get data
-	$request = "SELECT * FROM object WHERE object_id = ".$_POST["id"];
-	$result  = mysql_query($request) or die("Document does not exist. (ID = ".$_POST["id"].", MODE = ".$_POST["mode"].")");
-	$row     = mysql_fetch_assoc($result);
+	if($db->select('object', array('*'),
+	               "object_id = ".$_POST["id"])) die("Document does not exist. (ID = ".$_POST["id"].", MODE = ".$_POST["mode"].")");;
+	$row     = $db->nextData();
 	
 	if($_SESSION["uid"] == $row["object_locked_uid"] && $_POST["mode"] == "read")
 		$_POST["mode"] = "write";
@@ -35,14 +38,14 @@
 		
 		print_default_header($row);
 		
-		$request = "BEGIN";
-		mysql_query($request) or die("Could not start transaction to lock records: ".mysql_error());
-		$request = "SELECT * FROM object WHERE object_id = ".$_POST["id"]." FOR UPDATE";
-		$result  = mysql_query($request) or rollback_die("Could not accquire lock on document records: ".mysql_error());
+		if($db->execute("BEGIN")) die("Could not start transaction to lock records: ".$db->lastError());
+		
+		$request = "SELECT * FROM object WHERE object_id = ".$_POST["id"]." FOR UPDATE";		
+		if($db->execute($request)) rollback_die("Could not accquire lock on document records: ".$db->lastError());
 		
 		$request = "UPDATE object SET object_locked_uid = ".$_SESSION["uid"]." WHERE object_id = ".$_POST["id"];
-		$result  = mysql_query($request) or rollback_die("Could not set locking user in document record: ".mysql_error());
-		mysql_query("COMMIT");
+		if($db->execute($request)) rollback_die("Could not set locking user in document record: ".mysql_error());
+		if($db->execute("COMMIT")) die("Could not commit transaction: ".$db->lastError());
 		
 		include("ckeditor/ckeditor.php");
 		// Include the CKEditor class.
@@ -78,14 +81,13 @@
 		// Unlock record
 		check_record_lock($row);
 		
-		$request = "BEGIN";
-		mysql_query($request) or die("NOK;Could not start transaction to unlock records: ".mysql_error());
+		if($db->execute("BEGIN")) die("NOK;Could not start transaction to unlock records: ".mysql_error());
 		$request = "SELECT * FROM object WHERE object_id = ".$_POST["id"]." FOR UPDATE";
-		$result  = mysql_query($request) or rollback_die("NOK;Could not accquire lock on document records: ".mysql_error());
+		if($db->execute($request)) rollback_die("NOK;Could not accquire lock on document records: ".mysql_error());
 		
 		$request = "UPDATE object SET object_locked_uid = 0 WHERE object_id = ".$_POST["id"];
-		$result  = mysql_query($request) or rollback_die("NOK;Could not remove locking user in document record: ".mysql_error());
-		mysql_query("COMMIT");
+		if($db->execute($request)) rollback_die("NOK;Could not remove locking user in document record: ".mysql_error());
+		$db->execute("COMMIT");
 		
 		// return document id to AJAX
 		echo $_POST["id"].";Record unlocked.";
@@ -94,7 +96,7 @@
 	{
 		include('history.php');
 		print_hidden_fields();
-	}
+	} 
 	else if($_POST["mode"] == "show_version")
 	{
 		if(!isset($_POST["version"])) die("No version to restore.");
@@ -108,54 +110,59 @@
 	
 	function getDocumentContent($did)
 	{
-		$request = "SELECT object_type FROM object WHERE object_id = $did";
-		$result  = mysql_query($request) or die("Error while loading document: ".mysql_error());
-		if(mysql_num_rows($result) < 1) die("Requested document (#$did) does not exist.");
+		global $db;
 		
-		$row = mysql_fetch_assoc($result);
+		if($db->select('object', array('object_type'), "object_id = $did")) 
+			die("Error while loading document: ".mysql_error());
+		$row = $db->nextData() or die("Requested document (#$did) does not exist.");
+		
 		$oid = $row["object_type"];
 		if($oid != "D") die("This document can not be displayed!");
 		
 		$request = "SELECT object_data_text FROM object_data WHERE object_data_id = $did";
-		$result  = mysql_query($request) or die("Error while loading document data: ".mysql_error());
-		if(mysql_num_rows($result) < 1) die("Requested document (#$did) does not have any data.");
-		$row = mysql_fetch_assoc($result);
+		if($db->select('object_data', array('object_data_text'), "object_data_id = $did"))
+			die("Error while loading document data: ".mysql_error());
+		$row = $db->nextData() or die("Requested document (#$did) does not have any data.");
 		
 		return $row["object_data_text"];
 	}
 	
 	function getDocumentContentFromVersion($did, $version)
 	{
-		$request = "SELECT object_type FROM object WHERE object_id = $did";
-		$result  = mysql_query($request) or die("Error while loading versioned document: ".mysql_error());
-		if(mysql_num_rows($result) < 1) die("Requested version (Document# $did, Version# $version) does not exist.");
+		global $db;
 		
-		$row = mysql_fetch_assoc($result);
+		if($db->select('object', 'object_type', "object_id = $did"))
+			die("Error while loading versioned document: ".mysql_error());
+		$row = $db->nextData() or die("Requested version (Document# $did, Version# $version) does not exist.");
+		
 		$oid = $row["object_type"];
 		if($oid != "D") die("This document can't be displayed!");
 		
 		$request = "SELECT versioned_data_text FROM versioned_data WHERE versioned_data_id = $did AND versioned_data_lnr = $version";
-		$result  = mysql_query($request) or die("Error while loading versioned document data: ".mysql_error());
-		if(mysql_num_rows($result) < 1) die("Requested document (Document# $did, Version# $version) does not have any data.");
-		$row = mysql_fetch_assoc($result);
+		if($db->select('versioned_data', 'versioned_data_text', "versioned_data_id = $did"))
+			die("Error while loading versioned document data: ".mysql_error());
+		$row = $db->nextData() or die("Requested document (Document# $did, Version# $version) does not have any data.");
 		
 		return $row["versioned_data_text"];
 	}
 	
 	function rollback_die($text){
-			mysql_query("ROLLBACK");
+		global $db;
+		$db->execute("ROLLBACK");
 			die($text);
 	}
 	
 	function check_record_lock($row){
+		global $db;
+		
 		if($row["object_locked_uid"] != 0 &&
 		   $row["object_locked_uid"] != $_SESSION["uid"]){
 			$locked_uid = $row["object_locked_uid"];
-			$request = "SELECT user_name FROM user where user_uid = $locked_uid";
-			$result  = mysql_query($request) or die("Record is locked by unknown user (Error: ".mysql_error().")");
 			
-			if(mysql_num_rows($result) < 1) die("Record is locked by deleted user (uid = $locked_uid)");
-			$user_row = mysql_fetch_assoc();
+			if($db->select('user', 'user_name', "user_uid = $locked_uid"))
+				die("Record is locked by unknown user (Error: ".mysql_error().")");
+			
+			$user_row = $db->nextData() or die("Record is locked by deleted user (uid = $locked_uid)");
 			
 			die("Document is locked by another user. (UID = ".$locked_uid.", USER_NAME = ".$user_row["user_name"].")");
 		}
@@ -163,15 +170,19 @@
 	}
 	
 	function print_default_header($row){
-		$request = "SELECT object_data_last_change, object_data_last_user FROM object_data WHERE object_data_id = ".$row["object_id"];
-		$result  = mysql_query($request) or die("Error while retrieving last change data: ".mysql_error());
-		$change  = mysql_fetch_assoc($result);
+		global $db;
+		
+		if($db->select('object_data', array('object_data_last_change', 'object_data_last_user'), 
+		               "object_data_id = ".$row["object_id"]))
+			die("Error while retrieving last change data: ".mysql_error());
+		$change  = $db->nextData();
 		
 		$username = "???";
 		$request = "SELECT user_name FROM user WHERE user_uid = ".$change["object_data_last_user"];
-		$result  = mysql_query($request) or $username = "<unknown>";
+		if($db->select('user', 'user_name', "user_uid = ".$change["object_data_last_user"]))
+			$username = "<unknown>";
 		if($username != "<unknown>"){
-			$user    = mysql_fetch_assoc($result);
+			$user    = $db->nextData();
 			$username = $user["user_name"];
 		}
 		
