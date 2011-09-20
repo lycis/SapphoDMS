@@ -43,8 +43,9 @@
 		$request = "SELECT * FROM object WHERE object_id = ".$_POST["id"]." FOR UPDATE";		
 		if($db->execute($request)) rollback_die("Could not accquire lock on document records: ".$db->lastError());
 		
-		$request = "UPDATE object SET object_locked_uid = ".$_SESSION["uid"]." WHERE object_id = ".$_POST["id"];
-		if($db->execute($request)) rollback_die("Could not set locking user in document record: ".mysql_error());
+		$data = array("object_locked_uid" => $_SESSION["uid"]);
+		if($db->update('object', $data, "object_id = ".$_POST["id"])) 
+			rollback_die("Could not set locking user in document record: ".$db->lastError());
 		if($db->execute("COMMIT")) die("Could not commit transaction: ".$db->lastError());
 		
 		include("ckeditor/ckeditor.php");
@@ -85,8 +86,9 @@
 		$request = "SELECT * FROM object WHERE object_id = ".$_POST["id"]." FOR UPDATE";
 		if($db->execute($request)) rollback_die("NOK;Could not accquire lock on document records: ".mysql_error());
 		
-		$request = "UPDATE object SET object_locked_uid = 0 WHERE object_id = ".$_POST["id"];
-		if($db->execute($request)) rollback_die("NOK;Could not remove locking user in document record: ".mysql_error());
+		$data = array("object_locked_uid" => 0);
+		if($db->update('object', $data, 'object_id = '.$_POST["id"])) 
+			rollback_die("NOK;Could not remove locking user in document record: ".$db->lastError());
 		$db->execute("COMMIT");
 		
 		// return document id to AJAX
@@ -119,7 +121,6 @@
 		$oid = $row["object_type"];
 		if($oid != "D") die("This document can not be displayed!");
 		
-		$request = "SELECT object_data_text FROM object_data WHERE object_data_id = $did";
 		if($db->select('object_data', array('object_data_text'), "object_data_id = $did"))
 			die("Error while loading document data: ".mysql_error());
 		$row = $db->nextData() or die("Requested document (#$did) does not have any data.");
@@ -137,10 +138,9 @@
 		$oid = $row["object_type"];
 		if($oid != "D") die("This document can't be displayed!");
 		
-		$request = "SELECT versioned_data_text FROM versioned_data WHERE versioned_data_id = $did AND versioned_data_lnr = $version";
 		if($db->select('versioned_data', 'versioned_data_text', 
 		               "versioned_data_id = $did AND versioned_data_lnr = $version"))
-			die("Error while loading versioned document data: ".mysql_error());
+			die("Error while loading versioned document data: ".$db->lastError());
 		$row = $db->nextData() or die("Requested document (Document# $did, Version# $version) does not have any data.");
 		
 		return $row["versioned_data_text"];
@@ -160,7 +160,7 @@
 			$locked_uid = $row["object_locked_uid"];
 			
 			if($db->select('user', 'user_name', "user_uid = $locked_uid"))
-				die("Record is locked by unknown user (Error: ".mysql_error().")");
+				die("Record is locked by unknown user (Error: ".$db->lastError().")");
 			
 			$user_row = $db->nextData() or die("Record is locked by deleted user (uid = $locked_uid)");
 			
@@ -178,7 +178,6 @@
 		$change  = $db->nextData();
 		
 		$username = "???";
-		$request = "SELECT user_name FROM user WHERE user_uid = ".$change["object_data_last_user"];
 		if($db->select('user', 'user_name', "user_uid = ".$change["object_data_last_user"]))
 			$username = "<unknown>";
 		if($username != "<unknown>"){
