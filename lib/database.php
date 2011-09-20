@@ -34,6 +34,9 @@ class DatabaseConnection{
 	const db_select_error  = 1;
 	const db_select_nodata = 2;
 	
+	// return codes for insert()
+	const db_insert_error = 1;
+	
 	// error codes for nextData()
 	const db_next_nodata = false;
 	
@@ -165,6 +168,49 @@ class DatabaseConnection{
 	// insert into database
 	function insert($table, $fields)
 	{
+		if(!is_array($fields)) return self::db_insert_error;
+		
+		$query = '';
+		
+		if($this->db_type == 'mysql')
+		{
+			$query = 'INSERT INTO ';
+			$query .= mysql_real_escape_string($table);
+			
+			$query .= '(';
+			$fieldnames = array_keys($fields);
+			for($i=0; $i<count($fieldnames); $i++){
+				$query .= $fieldnames[$i];
+				
+				if($i != count($fieldnames)-1)
+					$query .= ', ';
+			}
+			
+			$query .= ') VALUES(';
+			$values = array_values($fields);
+			for($i=0; $i<count($values); $i++){
+				$query .= $values[$i];
+				
+				if($i != count($values)-1)
+					$query .= ', ';
+			}
+			$query .= ")";
+		}
+		
+		$this->setLastQuery($query);
+		$result = 0;
+		
+		if($this->db_type = 'mysql')
+			$result = mysql_query($query);
+		
+		if(!$result)
+		{
+			$this->error_message = $this->getSQLError();
+			return self::db_insert_error;
+		}
+		
+		$this->lastResult = $result;
+		return 0;
 	}
 	
 	// get next data row of the last query

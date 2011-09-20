@@ -33,6 +33,13 @@
 	$object = $db->nextData() or die("error: ".$db->lastError());
 	echo "</p>";
 	
+	echo "<h3>insert</h3>";
+	echo "<p>";
+	$data = array("temp_data" => 0xff);
+	$insert = $db->insert('temp', $data);
+	if($insert) die("error - $insert: ".$db->lastError());
+	echo "</p>";
+	
 	echo "<h3>close connection</h3>";
 	echo "<p>";
 	$r = $db->close();
