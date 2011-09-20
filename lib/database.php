@@ -37,6 +37,9 @@ class DatabaseConnection{
 	// return codes for insert()
 	const db_insert_error = 1;
 	
+	// return codes for update()
+	const db_update_error = 1;
+	
 	// error codes for nextData()
 	const db_next_nodata = false;
 	
@@ -195,6 +198,48 @@ class DatabaseConnection{
 					$query .= ', ';
 			}
 			$query .= ")";
+		}
+		
+		$this->setLastQuery($query);
+		$result = 0;
+		
+		if($this->db_type = 'mysql')
+			$result = mysql_query($query);
+		
+		if(!$result)
+		{
+			$this->error_message = $this->getSQLError();
+			return self::db_insert_error;
+		}
+		
+		$this->lastResult = $result;
+		return 0;
+	}
+	
+	// update a dataset
+	function update($table, $data, $where = '')
+	{
+		if(!is_array($data)) return self::db_update_error;
+		$query = '';
+		
+		if($this->db_type = 'mysql')
+		{
+			$query .= 'UPDATE ';
+			$query .= mysql_real_escape_string($table);
+			
+			$query .= ' SET ';
+			$keys = array_keys($data);
+			for($i=0; $i<count($keys); $i++)
+			{
+				$query .= mysql_real_escape_string($keys[$i]).' = '.
+				          mysql_real_escape_string($data[$keys[$i]]);
+				if($i != count($keys)-1)
+					$query .= ', ';
+			}
+			
+			$where = trim($where);
+			if($where != '')
+				$query .= ' WHERE '.mysql_real_escape_string($where);
 		}
 		
 		$this->setLastQuery($query);

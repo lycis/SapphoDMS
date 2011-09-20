@@ -40,6 +40,13 @@
 	if($insert) die("error - $insert: ".$db->lastError());
 	echo "</p>";
 	
+	echo "<h3>update</h3>";
+	echo "<p>";
+	$data = array("temp_data" => 0x12345);
+	$update = $db->update('temp', $data);
+	if($update) die("error - $update: ".$db->lastError());
+	echo "</p>";
+	
 	echo "<h3>close connection</h3>";
 	echo "<p>";
 	$r = $db->close();
