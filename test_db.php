@@ -1,10 +1,10 @@
 <?php
-	require_once('lib/database.php');
+	require_once('lib/sappho_dbc/sappho_dbc.php');
 	
 	echo "<h1>Database Module Test</h1>";
 	echo "<h3>Establishing connection</h3>";
 	echo "<p>";
-	$db = new DatabaseConnection('mysql', 'localhost', 'sappho', 'sappho');
+	$db = new SapphoDatabaseConnection(SapphoDatabaseConnection::db_type_mysql, 'localhost', 'sappho', 'sappho');
 	$db->setDebug(2);
 	if($db->connect('test123') != 0)
 		die("foo ".$db->lastError());

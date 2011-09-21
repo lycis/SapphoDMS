@@ -1,10 +1,10 @@
 <?php
 	session_start();
 	include("../config.php");
-	include("../lib/database.php");
+	include("../lib/sappho/sappho_dbc.php");
 	
 	global $db;
-	$db = new DatabaseConnection($db_type, $db_host, $db_name, $db_user);
+	$db = new SapphoDatabaseConnection($db_type, $db_host, $db_name, $db_user);
 	if($db->connect($db_password)) die("database error: ".$db->lastError());
 	
 	if(!isset($_POST["id"])) die("Error: No document!");
