@@ -286,7 +286,7 @@
 							</td>
 						</tr>
 						<tr>
-							<td colspan="2">
+							<td colspan="2" align="center">
 								<div id="user-info"></div>
 							</td>
 						</tr>
