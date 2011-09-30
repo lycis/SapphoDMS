@@ -18,7 +18,13 @@
 		exit;
 	}
 	
-	$sdbc = new SapphoDatabaseConnection($_POST["type"],
+	$type = "";
+	if($_POST["type"] == "mysql")
+		$type = SapphoDatabaseConnection::db_type_mysql;
+	else if($_POST["type"] == "postgre")
+		$type = SapphoDatabaseConnection::db_type_postgre;
+	
+	$sdbc = new SapphoDatabaseConnection($type,
 	                                     $_POST["host"],
 								 	 	 $_POST["name"],
 										 $_POST["user"]);
@@ -53,17 +59,18 @@
 	}
 	
 	$ins = $sdbc->insert("user", array("user_name" => $_POST["auser"],
-	                            "user_password" => crypt($_POST["apwd"])));
+	                                   "user_password" => crypt($_POST["apwd"])));
 	if($ins)
 	{
 		$reason = "";
 		if($ins == SapphoDatabaseConnection::db_error_wrong_dtype)
 			$reason = "datatype error";
 		$json["state"] = "NK";
-		$json["error_message"] = "Fatal error during user creation - ".
+		$json["error_message"] = "Fatal $ins error during user creation - ".
 			                     $sdbc->lastError();	
-		print json_encode($json);
 		$sdbc->rollbackTransaction();
+		print json_encode($json);
+		exit;
 	}
 	$sdbc->commitTransaction();
 	

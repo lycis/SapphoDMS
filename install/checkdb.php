@@ -11,7 +11,13 @@
 	if(!isset($_POST["user"])) $_POST["user"] = "";
 	if(!isset($_POST["password"])) $_POST["password"] = "";
 	
-	$sdbc = new SapphoDatabaseConnection($_POST["type"],
+	$type = "";
+	if($_POST["type"] == "mysql")
+		$type = SapphoDatabaseConnection::db_type_mysql;
+	else if($_POST["type"] == "postgre")
+		$type = SapphoDatabaseConnection::db_type_postgre;
+	
+	$sdbc = new SapphoDatabaseConnection($type,
 	                                     $_POST["host"],
 								 	 	 $_POST["name"],
 										 $_POST["user"]);
@@ -33,7 +39,7 @@
 			$reason = "please provide all login options";
 		if($conn == SapphoDatabaseConnection::db_connect_db_notexist)
 			$reason = "database does not exist";
-		$json["error_message"] = "Could not establish connection (".$sdbc->lastError().")";
+		$json["error_message"] = "Could not establish connection ($conn; ".$sdbc->lastError().")";
 	}
 	
 	$sdbc->close();

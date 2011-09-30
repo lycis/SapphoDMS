@@ -16,7 +16,13 @@
 		exit;
 	}
 	
-	$sdbc = new SapphoDatabaseConnection($_POST["type"],
+	$type = "";
+	if($_POST["type"] == "mysql")
+		$type = SapphoDatabaseConnection::db_type_mysql;
+	else if($_POST["type"] == "postgre")
+		$type = SapphoDatabaseConnection::db_type_postgre;
+	
+	$sdbc = new SapphoDatabaseConnection($type,
 	                                     $_POST["host"],
 								 	 	 $_POST["name"],
 										 $_POST["user"]);
@@ -93,7 +99,7 @@
 		else
 			$stmnt .= " ";
 	}
-	
+	$sdbc->commitTransaction();
 	$sdbc->close();
 	
 	print json_encode($json);

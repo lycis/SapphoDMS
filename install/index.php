@@ -118,7 +118,7 @@
 						   apwd: $("#user-password").val()},
 					dataType: "json",
 					success: function(req){
-								alert(req);
+								//alert(req);
 								if(req.state == "OK")
 								{
 									$("#user-ok").val("true");
@@ -132,6 +132,7 @@
 								}
 							},
 					error: function(x, text, thr){
+							//alert(x);
 							$("#user-ok").val("false");
 							$("#user-info").html("<p class='notification' style='background: #ff0000'>Error: "+text+" - "+thr+"</p>");
 						   }
@@ -286,7 +287,7 @@
 							</td>
 						</tr>
 						<tr>
-							<td colspan="2" align="center">
+							<td colspan="2">
 								<div id="user-info"></div>
 							</td>
 						</tr>

@@ -932,6 +932,7 @@ class SapphoDatabaseConnection{
 		}
 		
 		$this->tablestruct[$table] = $struct;
+		return true;
 	}
 	
 	/**
