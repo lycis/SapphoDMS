@@ -3,7 +3,7 @@
 	 * Database Configuration
 	 */
 	$db_user     = "sappho";
-	$db_password = "test123";
+	$db_password = "1234";
 	$db_name     = "sappho";
 	$db_host     = "localhost";
 	$db_type     = "mysql";

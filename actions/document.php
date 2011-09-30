@@ -1,7 +1,7 @@
 <?php
 	session_start();
 	include("../config.php");
-	include("../lib/sappho/sappho_dbc.php");
+	include("../lib/sdbc/sappho_dbc.php");
 	
 	global $db;
 	$db = new SapphoDatabaseConnection($db_type, $db_host, $db_name, $db_user);
