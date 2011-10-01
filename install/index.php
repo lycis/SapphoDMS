@@ -146,7 +146,65 @@
 					return;
 				}
 				
-				// write config here
+				$("#user-info").html("<p class='notification' style='background: #ffff00'>Writing configurations file...!</p>");
+				$.ajax({
+					url: "crfiles.php",
+					type: "POST",
+					data: {host: $("#db-host").val(),
+					       name: $("#db-name").val(),
+						   user: $("#db-user").val(),
+						   password: $("#db-password").val(),
+						   type: $("#db-type").val(),
+						   auser: $("#user-name").val(),
+						   apwd: $("#user-password").val()},
+					dataType: "json",
+					success: function(req){
+								//alert(req);
+								if(req.state == "OK")
+								{
+									$("#progress").progressbar("value", 100);
+									$("#user-info").html("<p>You've sucessfuly installed Sappho DMS. It is now fully configured und ready for use.</p>");
+									$("#user-info").attr("title", "Installation complete");
+									$("#user-info").dialog({
+															show: 'explode',
+															hide: 'explode',
+															modal: true,
+															buttons: {
+																		"ok": function() {
+																							location.reload();
+																							$( this ).dialog( "close" );
+																			  },
+															}
+									});
+								}
+								else
+								{
+									$("#user-ok").val("false");
+									$("#user-info").html("An error occured during!<p>An error occured during the creation of the configuration files. "+
+									                     "Please rename your installation scripts manually and copy this to config.php in the root directory: "+
+														 "</p><p><textarea>"+req.error_message+"</textarea></p>");
+									$("#user-info").attr("title", "An error occured during creation of config files!");
+									$("#user-info").dialog({
+															show: 'explode',
+															hide: 'explode',
+															height: 600,
+															width: 800,
+															modal: true,
+															buttons: {
+																		"ok": function() {
+																							$( this ).dialog( "close" );
+																			  }
+															}
+									});
+								}
+							},
+					error: function(x, text, thr){
+							//alert(x);
+							$("#user-ok").val("false");
+							$("#user-info").html("<p class='notification' style='background: #ff0000'>Error: "+text+" - "+thr+"</p>");
+						   }
+				});
+				
 			}
 			
 			$("#installsteps").accordion({autoHeight: false});
@@ -158,6 +216,7 @@
 			$("#gendb-button").click(generateDatabase);
 			$("#gendb-next-step").click(gendbNextStep);
 			$("#user-button").click(createUser);
+			$("#user-next-step").click(userNextStep);
 			
 			$("#db-ok").val("false");
 			$("#gendb-ok").val("false");
