@@ -1,3 +1,7 @@
+<?php
+	if(file_exists('installed'))
+		die("System is configured and ready for use!");
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 5.0//EN" "http://www.w3.org/TR/html5/strict.dtd">
 <html>  
 <head>  
@@ -168,7 +172,8 @@
 								if(req.state == "OK")
 								{
 									$("#progress").progressbar("value", 100);
-									$("#user-info").html("<p>You've sucessfuly installed Sappho DMS. It is now fully configured und ready for use.</p>");
+									$("#user-info").html("<p>You've sucessfuly installed Sappho DMS. It is now fully configured und ready for use.</p>"+
+									                     "<p>You should delete the install directory or scure it otherwise so nobody might access it!</p");
 									$("#user-info").attr("title", "Installation complete");
 									$("#user-info").dialog({
 															show: 'explode',
@@ -185,9 +190,9 @@
 								else
 								{
 									$("#user-ok").val("false");
-									$("#user-info").html("An error occured during!<p>An error occured during the creation of the configuration files. "+
-									                     "Please rename your installation scripts manually and copy this to config.php in the root directory: "+
-														 "</p><p><textarea>"+req.error_message+"</textarea></p>");
+									$("#user-info").html("An error occured during the creation of the configuration files ("+
+									                     req.error_message+" )Please rename your installation scripts manually and copy this to config.php "+
+														 "in the root directory: </p><p><textarea>"+req.content+"</textarea></p>");
 									$("#user-info").attr("title", "An error occured during creation of config files!");
 									$("#user-info").dialog({
 															show: 'explode',
@@ -347,7 +352,7 @@
 								<input type="button" id="user-button" value="create user"/>
 							</td>
 							<td>
-								<input type="button" id="user-next-step" value="next step"/>
+								<input type="button" id="user-next-step" value="install"/>
 							</td>
 						</tr>
 						<tr>
