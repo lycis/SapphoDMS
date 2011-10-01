@@ -14,6 +14,7 @@
 	<script>
 		$(function(){
 			function checkDBConnection(){
+				$("#db-info").html("<p class='notification' style='background: #ffff00'>Connecting database...</p>");
 				$.ajax({
 					url: "checkdb.php",
 					type: "POST",
@@ -60,6 +61,8 @@
 					return;
 				}
 				
+				$("#gendb-info").html("<p class='notification' style='background: #ffff00'>Generating database...</p>");
+				
 				$.ajax({
 					url: "gendb.php",
 					type: "POST",
@@ -105,6 +108,8 @@
 					$("#user-info").html("<p class='notification' style='background: #ffff00'>Please complete all former steps!</p>");
 					return;
 				}
+				
+				$("#user-info").html("<p class='notification' style='background: #ffff00'>Creating user...</p>");
 				
 				$.ajax({
 					url: "cruser.php",
