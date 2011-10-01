@@ -4,9 +4,10 @@
 		function doLogin(){
 			$.post("actions/login.php", {username: $("#login_username").val(),
 										 password: $("#login_password").val()}, function(data){
-											if(data == "NOK"){
+										    var info = data.split(";");
+											if(info[0] == "NOK"){
 												$("#login_box").html(
-													"<p>Password or username are incorrect!</p>"+
+													"<p>"+info[1]+"</p>"+
 													"<p><input type='button' value='Try again' onClick='javascript:location.reload()'/></p>"
 												);
 												$("input:button").button();

@@ -1,31 +1,38 @@
 <?php	
 	session_start();
 	include("../config.php");
-	$db_conn = mysql_connect($db_host,$db_user,$db_password) or die("NOK;The database host is not available!");
-	mysql_select_db($db_name) or die("NOK;The database is not accessible!");
+	include("../lib/sdbc/sappho_dbc.php");
+	
+	$sdbc = new SapphoDatabaseConnection($db_type, $db_host, $db_name, $db_user);
+	if($sdbc->connect($db_password)) die("NOK;The database host is not available!");
 	
 	if(!isset($_POST["user"]) || !isset($_POST["area"])) die("NOK;Please provide complete data.");
 	
-	$request = "SELECT area_aid FROM area WHERE area_name = '".mysql_real_escape_string($_POST["area"])."'";
-	$result  = mysql_query($request) or die("NOK;Could not retrieve AreaId.");
-	$row     = mysql_fetch_assoc($result);
+	$where = "area_name = '".mysql_real_escape_string($_POST["area"])."'";
+	if($sdbc->select('area', 'area_aid', $where))
+		die("NOK;Could not retrieve AreaId - ".$sdbc->lastError());
+	$row     = $sdbc->nextData();
 	$area_id = $row["area_aid"];
 	
-	$request = "SELECT user_uid FROM user WHERE user_name = '".mysql_real_escape_string($_POST["user"])."'";
-	$result  = mysql_query($request) or die("NOK;Could not retrieve UserId.");
-	$row     = mysql_fetch_assoc($result);
+	$where = "user_name = '".$_POST["user"]."'";
+	if($sdbc->select('user', 'user_uid', $where))
+		die("NOK;Could not retrieve UserId.");
+	$row     = $sdbc->nextData();
 	$user_id = $row["user_uid"];
 	
-	$request = "SELECT * FROM user_area WHERE user_area_aid = $area_id AND user_area_uid = $user_id";
-	$result  = mysql_query($request) or die("NOK;Could not get association status!");
-	$row_count = mysql_num_rows($result);
+	$where = "user_area_aid = $area_id AND user_area_uid = $user_id";
+	if($sdbc->select('user_area', '*', $where))
+		die("NOK;Could not get association status - ".$sdbc->lastError());
+	$row_count = $sdbc->rowCount();
 	
 	if($row_count > 0)
 		die("NOK;The user is already associated to the area!");
 	
-	$request = "INSERT INTO user_area(user_area_uid, user_area_aid) VALUES($user_id, $area_id)";
-	$result  = mysql_query($request) or die("NOK;Could not add new area to user - ".mysql_error());
+	$ins = $sdbc->insert('user_area', array('user_area_uid' => $user_id,
+	                                     'user_area_aid' => $area_id));
+	if($ins) 
+		die("NOK;Could not add new area to user - ".$sdbc->lastError());
 	
 	echo "OK;";
-	mysql_close($db_conn);
+	$sdbc->close();
 ?>

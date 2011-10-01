@@ -1,30 +1,34 @@
 <?php
 	session_start();
 	include("../config.php");
-	$db_conn = mysql_connect($db_host,$db_user,$db_password) or die("The database host is not available!");
-	mysql_select_db($db_name) or die("The database is not accessible!");
+	include("../lib/sdbc/sappho_dbc.php");
+	
+	$sdbc = new SapphoDatabaseConnection($db_type, $db_host, $db_name, $db_user);
+	if($sdbc->connect($db_password)) die("NOK;The database host is not available!");
 	
 	if(!isset($_POST["username"]) || !isset($_POST["password"])) die("NOK");
 	
 	if(!preg_match("/^[A-Za-z0-9_\.\-]{3,30}$/", $_POST["username"])) die("NOK");
 	
-	$request = "SELECT * FROM user WHERE user_name = '".mysql_real_escape_string($_POST["username"])."'";
-	$result  = mysql_query($request) or die("NOK");
-	$row     = mysql_fetch_assoc($result);
+	$where = "user_name = '".$_POST["username"]."'";
+	if($sdbc->select('user', '*', $where)) 
+		die("NOK;Could not get userdata: ".$sdbc->lastError());
+	$row     = $sdbc->nextData();
 	
 	if(crypt($_POST["password"], $row["user_password"]) != $row["user_password"])
-		die("NOK");
+		die("NOK;Password oder username incorrect!");
 		
 	$_SESSION["logged_in"] = 1;
-	$_SESSION["uid"]       = $row["user_uid"];
+	$_SESSION["uid"] = $row["user_uid"];
 	
-	$request = "SELECT * FROM profile WHERE profile_uid = ".$_SESSION["uid"];
-	$result  = mysql_query($request) or die("NOK");
-	$row     = mysql_fetch_assoc($result);
+	$where = "profile_uid = ".$_SESSION["uid"];
+	if($sdbc->select('profile', '*', $where))
+		die("NOK;Could not access user profile: ".$sdbc->lastError());
+	$row = $sdbc->nextData();
 	
 	$_SESSION["first_name"] = $row["profile_firstname"];
 	$_SESSION["last_name"] = $row["profile_lastname"];
 	
 	echo "OK";
-	mysql_close($db_conn);
+	$sdbc->close()
 ?>

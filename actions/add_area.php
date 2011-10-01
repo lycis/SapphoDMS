@@ -1,21 +1,25 @@
 <?php
 	session_start();
 	include("../config.php");
-	$db_conn = mysql_connect($db_host,$db_user,$db_password) or die("NOK;The database host is not available!");
-	mysql_select_db($db_name) or die("NOK;The database is not accessible!");
+	include("../lib/sdbc/sappho_dbc.php");
+	
+	$sdbc = new SapphoDatabaseConnection($db_type, $db_host, $db_name, $db_user);
+	if($sdbc->connect($db_password)) die("NOK;The database host is not available!");
 	
 	if(!isset($_POST["area"])) die("NOK;Please provide an area name!");
 	
-	$request = "SELECT * FROM area WHERE area_name = '".mysql_real_escape_string($_POST["area"])."'";
-	$result  = mysql_query($request) or die("NOK;Error while checking existence!");
-	$row_num = mysql_num_rows($result);
+	$where = "area_name = '".$_POST["area"]."'";
+    if($sdbc->select('area', '*', $where))
+		die("NOK;Error while checking existence!");
+	$row_num = $sdbc->nextData();
 	
 	if($row_num > 0)
 		die("NOK;Area already exists!");
 	
-	$request = "INSERT INTO area(area_name) values('".mysql_real_escape_string($_POST["area"])."')";
-	$result  = mysql_query($request) or die("NOK;Error while creation of new are: ".mysql_error());
+	$request = "INSERT INTO area(area_name) values('".$_POST["area"]."')";
+	if($sdbc->insert('area', array('area_name' => $_POST["area"]))) 
+		die("NOK;Error while creation of new are: ".mysql_error());
 	
 	echo "OK;";
-	mysql_close($db_conn);
+	$sdbc->close();
 ?>

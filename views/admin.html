@@ -1,3 +1,7 @@
+<?php
+	if(!$sdbc) die("No database connector defined!");
+?>
+
 <!-- JQUERY -->
 <script>
 	$(function(){
@@ -112,9 +116,9 @@
 				<select id="associate_user_name">
 					<option>-- no user --</option>
 					<?php
-						$request = "SELECT user_name FROM user";
-						$result  = mysql_query($request) or die("Could not get list of users.");
-						while($row = mysql_fetch_assoc($result)){
+						if($sdbc->select('user', 'user_name'))
+							die("Could not get list of users.");
+						while($row = $sdbc->nextData()){
 							echo "<option>".$row["user_name"]."</option>";
 						}
 					?>
@@ -131,8 +135,9 @@
 				<tr><th>Delete Area:</th><td><select id="delete_area_item">
 					<?php
 						$request = "SELECT area_name FROM area";
-						$result  = mysql_query($request) or die("Could not get area data.");
-						while($row = mysql_fetch_assoc($result)){
+						if($sdbc->select('area', 'area_name'))
+							die("Could not get area data.");
+						while($row = $sdbc->nextData()){
 							echo "<option>".$row["area_name"]."</option>";
 						}
 					?>
