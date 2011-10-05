@@ -43,6 +43,8 @@ class SapphoDatabaseConnection{
 	// error message
 	private $error_message;
 	
+	private $last_insert_id;
+	
 	// debug fields
 	private $debug_level;
 	private $last_query;
@@ -117,6 +119,7 @@ class SapphoDatabaseConnection{
 			$this->synopt = new SapphoSyntaxOptimizer($this->db_type);
 		
 		$this->tablestruct = array();
+		$this->last_insert_id = -1;
 	}
 	
 	/**
@@ -398,6 +401,12 @@ class SapphoDatabaseConnection{
 					$query .= ', ';
 			}
 			$query .= ")";
+			
+			if($struct->serialField() !== false)
+			{
+				$query .= " RETURNING ";
+				$query .= $this->escape_keywords(pg_escape_string($struct->serialField()));
+			}
 		}
 		
 		$this->setLastQuery($query);
@@ -415,6 +424,17 @@ class SapphoDatabaseConnection{
 		}
 		
 		$this->lastResult = $result;
+		
+		// last id
+		if($this->typeIs(self::db_type_mysql))
+			$this->last_insert_id = $this->db_handle->insert_id;
+		 else if($this->typeIs(self::db_type_postgre) &&
+		          $struct->serialField())
+		{
+			$data = pg_fetch_assoc($result);
+			$this->last_insert_id = $data[$struct->serialField()];
+		}
+		
 		return 0;
 	}
 	
@@ -629,12 +649,16 @@ class SapphoDatabaseConnection{
 	 *
 	 * \returns An associated array or #db_next_nodata
 	 */
-	function nextData(){
+	function nextData($result=false){
+		// if a ressource is given take it, otherwise take the default result
+		if($result === false)
+			$result = $this->lastResult;
+		
 		if(($this->typeIs(self::db_type_mysql) &&
-		    !$this->lastResult->num_rows) 
+		    !$result->num_rows) 
 			||
            ($this->typeIs(self::db_type_postgre) &&
-		    !pg_num_rows($this->lastResult)))
+		    !pg_num_rows($result)))
 		{
 			$this->error_message = "SDBC - last result set is empty";
 			return self::db_next_nodata;
@@ -646,9 +670,9 @@ class SapphoDatabaseConnection{
 		
 		$data = 0;
 		if($this->typeIs(self::db_type_mysql))
-			$data = $this->lastResult->fetch_assoc();
+			$data = $result->fetch_assoc();
 	    else if($this->typeIs(self::db_type_postgre))
-			$data = pg_fetch_assoc($this->lastResult);
+			$data = pg_fetch_assoc($result);
 			
 		if($this->debug_level > 1)
 		{
@@ -879,9 +903,17 @@ class SapphoDatabaseConnection{
 			}
 			
 			$pos    = strpos($data[1], "(");
-			$type   = substr($data[1], 0, $pos);
-			$pos2   = strpos($data[1], ")");
-			$length = substr($data[1], $pos+1, $pos2-$pos-1);
+			if($pos !== false)
+			{
+				$type   = substr($data[1], 0, $pos);
+				$pos2   = strpos($data[1], ")");
+				$length = substr($data[1], $pos+1, $pos2-$pos-1);
+			}
+			else
+			{
+				$type = $data[1];
+				$length = -1;
+			}
 			
 			$struct->addColumn($data[0], $type, $length);
 			if($this->debug_level > 3)
@@ -915,16 +947,22 @@ class SapphoDatabaseConnection{
 		$struct = new SapphoTableStructure($table);
 		while(($data = pg_fetch_assoc($result)))
 		{
+			// check if this is a incremented field
+			$serial = false;
+			if(strpos($data["column_default"], "nextval(") !== false)
+				$serial = true;
+			
 			if($this->debug_level > 3)
 			{
 				echo "SDBC: Analyzing attribute: ";
 				echo $data["column_name"]." => ";
 				echo $data["data_type"];
+				echo " => serial: $serial (".$data["column_default"].")";
 				echo "<br/>";
 			}
 			
 			// length is not stored for postgre - it's not used anyway...
-			$struct->addColumn($data["column_name"], $data["data_type"], -1);
+			$struct->addColumn($data["column_name"], $data["data_type"], -1, $serial);
 		}
 		
 		$this->tablestruct[$table] = $struct;
@@ -1018,6 +1056,21 @@ class SapphoDatabaseConnection{
 			return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * \brief Get the last automatically incremented field of the last INSERT.
+	 *
+	 * Returns the value of the last automatically incremented field. In case of
+	 * MySQL this is the same value retrieved with mysqli::last_id. In case of
+	 * postgreSQL the last serial field of the last INSERT statement is returned.
+	 *
+	 * Of course this function will only return a valid result after an #insert()
+	 *
+	 * \returns value of the last incremented field
+	 */
+	function lastId(){
+		return $this->last_insert_id;
 	}
 }
 ?>

@@ -19,6 +19,9 @@ class SapphoTableStructure{
 	// list of columns
 	private $columns;
 	
+	// autoincremented field in this table
+	private $serial_field;
+	
 	// table name - just for fun...
 	private $table;
 	
@@ -41,7 +44,8 @@ class SapphoTableStructure{
 	function __construct($tablename)
 	{
 		$this->table = $tablename;
-		$columns = array();
+		$this->columns = array();
+		$this->serial_field = false;
 	}
 	
 	/**
@@ -50,8 +54,9 @@ class SapphoTableStructure{
 	 * \param $name column name
 	 * \param $dtype datatype
 	 * \param $length data length
+	 * \param $serial if \c true this field is marked as automatically incremented (only relevant for postgreSQL)
 	 */
-	function addColumn($name, $dtype, $length)
+	function addColumn($name, $dtype, $length, $serial=false)
 	{
 		$typemark = '';
 		$dtype = strtoupper($dtype);
@@ -63,6 +68,9 @@ class SapphoTableStructure{
 			$typemark = self::dtype_unknown;
 		
 		$this->columns[$name] = array($typemark, $length);
+		
+		if($serial === true)
+			$this->serial_field = $name;
 	}
 	
 	/**
@@ -113,6 +121,16 @@ class SapphoTableStructure{
 			
 		return $count($this->columns);
 	}
+	
+	/**
+	 * \brief The field that is automatically incremented within this table.
+	 * \warning This function is used for postgreSQL only!
+	 * \returns name of the column.
+	 */
+	 function serialField()
+	 {
+		return $this->serial_field;
+	 }
 }
 
 ?>
