@@ -2,7 +2,6 @@
 <script>
 	$(function(){
 		function changeNames(){
-			alert($("#name_first").val()+" = "+$("#name_last").val());
 			$.post("actions/change_name.php",
 				   {first: $("#name_first").val(),
 				    last: $("#name_last").val()},

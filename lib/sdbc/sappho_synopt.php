@@ -84,6 +84,25 @@ class SapphoSyntaxOptimizer{
 	 }
 	 
 	 /**
+	  * \brief Formats the parameter to be used as a date in a SQL query.
+	  *
+	  * By using this method the given parameter is formatted so it can be used as
+	  * a date-based type like \c DATE or \c TIMESTAMP in an SQL query on the target
+	  * system. This functions only formats a return value of the time() function!
+	  *
+	  * \params $what the string you want to format
+	  * \returns a formatted value
+	  */
+	 function formatDate($what)
+	 {
+		if($this->db_type == self::db_type_mysql)
+			$what = "FROM_UNIXTIME($what)";
+		else if($this->db_type == self::db_type_postgre)
+			$what = "to_timestamp($what)";
+		return $what;
+	 }
+	 
+	 /**
 	  * \brief Formats a list of values to an according list of data types.
 	  *
 	  *  This functions formats an array of values to different datatypes. The datatypes are given
@@ -121,6 +140,9 @@ class SapphoSyntaxOptimizer{
 					break;
 				case SapphoTableStructure::dtype_string:
 					$value = $this->formatString($value);
+					break;
+				case SapphoTableStructure::dtype_date:
+					$value = $this->formatDate($value);
 					break;
 				default:
 					break;

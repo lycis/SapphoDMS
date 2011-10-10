@@ -4,15 +4,19 @@
 	   
 	if($_POST["mode"] == "normal")
 		session_start();
+		
 	include("../config.php");
-	$db_conn = mysql_connect($db_host,$db_user,$db_password) or die("The database host is not available!");
-	mysql_select_db($db_name) or die("The database is not accessible!");
+	include("../lib/sdbc/sappho_dbc.php");
+	
+	$sdbc = new SapphoDatabaseConnection($db_type, $db_host, $db_name, $db_user);
+	if($sdbc->connect($db_password)) die("NOK;The database host is not available!");
 	
 	if($_POST["area"] == "-- no area --") exit;
 	
-	$request = "SELECT area_aid FROM area WHERE area_name = '".mysql_real_escape_string($_POST["area"])."'";
-	$result  = mysql_query($request) or die("Error while retrieving area data!");
-	$row     = mysql_fetch_assoc($result);
+	$where = $sdbc->queryOptions()->where('area_name', SapphoQueryOptions::EQUALS, $_POST["area"]);
+	if($sdbc->select('area', 'area_aid', $where))
+		die("Error while retrieving area data!");
+	$row     = $sdbc->nextData();
 	$area_id = $row["area_aid"];
 	
 
@@ -45,9 +49,11 @@
 	echo "</span>";
 	echo "<ul>";
 	
-	$request = "SELECT * FROM object WHERE object_areaid = $area_id AND object_parent = 0 AND object_deleted = 'N' ORDER BY object_name";
-	$result  = mysql_query($request) or die("Error retrieving object data! ".mysql_error());
-	while($row = mysql_fetch_assoc($result)){
+	$where = "object_areaid = $area_id AND object_parent = 0 AND object_deleted = 'N' ORDER BY object_name";
+	if($sdbc->select('object', '*', $where))
+		die("Error retrieving object data! ".$sdbc->lastError());
+		
+	while($row = $sdbc->nextData()){
 		echo "<li>";
 		
 		$folderclass = "";
@@ -67,12 +73,16 @@
 		echo "</li>";
 	}
 	
-	mysql_close($db_conn);
+	$sdbc->close();
 	
 	function dive_into_folder($folder_id, $area_id){
-		$freq = "SELECT * FROM object WHERE object_id = $folder_id";
-		$fres = mysql_query($freq) or die("Could not retrieve data of folder-object $folder_id");
-		$frow = mysql_fetch_assoc($fres);
+		global $sdbc;
+		$clone = $sdbc->cloneConnection();
+		
+		$where = $clone->queryOptions()->where('object_id', SapphoQueryOptions::EQUALS, $folder_id);
+		if($clone->select('object', '*', $where))
+			die("Could not retrieve data of folder-object $folder_id");
+		$frow = $clone->nextData();
 		$folder_name = $frow["object_name"];
 		
 		$folderclass = "";
@@ -98,9 +108,15 @@
 		echo "</span>";
 		echo		"<ul>";
 		
-		$freq = "SELECT * FROM object WHERE object_areaid = ".$area_id." AND object_parent = $folder_id AND object_deleted = 'N' ORDER BY object_name";
-		$fres = mysql_query($freq) or die("Could not retrieve items in folder $folder_id");
-		while($frow = mysql_fetch_assoc($fres)){		
+		$where = "object_areaid = ".$area_id." AND object_parent = $folder_id AND object_deleted = 'N' ORDER BY object_name";
+		/*$where = $clone->queryOptions()->where('object_areaid', SapphoQueryOptions::EQUALS, $area_id)
+		                               ->andWhere('object_parent', SapphoQueryOptions::EQUALS, $folder_id)
+									   ->andWhere('object_deleted', SapphoQueryOptions::EQUALS, 'N')
+									   ->orderBy('object_name');*/
+		if($clone->select('object', '*', $where))
+			die("Could not retrieve items in folder $folder_id");
+			
+		while($frow = $clone->nextData()){		
 			echo "<li>";
 			if($frow["object_type"] == "F")
 				dive_into_folder($frow["object_id"], $area_id);
@@ -114,5 +130,6 @@
 
 		echo		"</ul>";
 		echo "</li>";
+		$clone->close();
 	}
 ?>

@@ -4,26 +4,32 @@
 	if(!isset($_SESSION["logged_in"])) die("NOK;Please log in.");
 	   
 	include("../config.php");
-	$db_conn = mysql_connect($db_host,$db_user,$db_password) or die("NOK;The database host is not available!");
-	mysql_select_db($db_name) or die("NOK;The database is not accessible!");
+	include("../lib/sdbc/sappho_dbc.php");
 	
-	$request = "SELECT * FROM object WHERE object_id = ".$_POST["oid"];
-	$result  = mysql_query($request) or die("NOK;Error while checking existance.");
-	if(mysql_num_rows($result) != 1) die("NOK;Object does not exist.");
-	$object = mysql_fetch_assoc($result);
+	$sdbc = new SapphoDatabaseConnection($db_type, $db_host, $db_name, $db_user);
+	if($sdbc->connect($db_password)) die("NOK;The database host is not available!");
+	
+	$where = $sdbc->queryOptions()->where('object_id', SapphoQueryOptions::EQUALS, $_POST["oid"]);
+	if($sdbc->select('object', '*', $where))
+		die("NOK;Error while checking existance.");
+	if($sdbc->rowCount() != 1) die("NOK;Object does not exist.");
+	$object = $sdbc->nextData();
 	
 	if($object["object_type"] == "F")
 	{
-		$request = "SELECT object_id FROM object WHERE object_deleted = 'N' AND object_parent = ".$_POST["oid"];
-		$result  = mysql_query($request) or die("NOK;Could not check if folder is empty.");
-		if(mysql_num_rows($result) > 0) die("NOK;The folder is not empty. ".mysql_num_rows($result));
+		$where = $sdbc->queryOptions()->where('object_deleted', SapphoQueryOptions::EQUALS, 'N')
+		                              ->andWhere('object_parent', SapphoQueryOptions::EQUALS, $_POST["oid"]);
+		if($sdbc->select('object', 'object_id', $where))
+			die("NOK;Could not check if folder is empty.");
+		if($sdbc->rowCount() > 0) die("NOK;The folder is not empty. ".$sdbc->lastError());
 	}
 	
-	$request = "UPDATE object SET object_deleted = 'Y' WHERE object_id = ".$_POST["oid"];
-	$result  = mysql_query($request) or die("NOK;Could not delete object.");
+	$where = $sdbc->queryOptions()->where('object_id', SapphoQueryOptions::EQUALS, $_POST["oid"]);
+	if($sdbc->update('object', array('object_deleted' => 'Y'), $where))
+		die("NOK;Could not delete object.");
 	
 	
 	
 	echo "OK;Object deleted.";
-	mysql_close($db_conn);
+	$sdbc->close();
 ?>

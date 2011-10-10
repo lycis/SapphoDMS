@@ -30,11 +30,14 @@ class SapphoTableStructure{
 	                                 'INT', 'INTEGER', 'BIGINT', 'DOUBLE', 'FLOAT', 'DECIMAL', 'DEC', 'FIXED');
 	private $string_types  = array('CHAR', 'VARCHAR', 'TEXT', 'BINARY', 'VARBINARY', 'TINYBLOB', 'TINYTEXT',
 	                                 'BLOB', 'MEDIUMBLOB', 'LONGBLOB', 'LONGTEXT', 'CHARACTER VARYING');
+	private $date_types    = array('DATE', 'TIMESTAMP', 'TIME', 'TIMESTAMP WITHOUT TIME ZONE',
+	                                 'TIMESTAMP WITH TIME ZONE', 'TIME WITHOUT TIME ZONE', 'TIME WITH TIME ZONE');
 									 
 	// constants for data type classification
 	const dtype_numeric = 'N'; /**< datatype mark for numeric values */
 	const dtype_string  = 'S'; /**< datatype mark for string (character) values */
 	const dtype_unknown = 'U'; /**< datatype mark for anything unknown */
+	const dtype_date    = 'D'; /**< datatype mark for date values */
 	
     /**
 	 * \brief Create an instance.
@@ -64,6 +67,8 @@ class SapphoTableStructure{
 			$typemark = self::dtype_numeric;
 		else if(in_array($dtype, $this->string_types))
 			$typemark = self::dtype_string;
+		else if(in_array($dtype, $this->date_types))
+			$typemark = self::dtype_date;
 		else
 			$typemark = self::dtype_unknown;
 		

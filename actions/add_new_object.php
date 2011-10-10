@@ -8,16 +8,12 @@
 	
 	$sdbc = new SapphoDatabaseConnection($db_type, $db_host, $db_name, $db_user);
 	if($sdbc->connect($db_password)) die("NOK;The database host is not available!");
-	   
-	$_POST["name"] = mysql_real_escape_string($_POST["name"]);
-	$_POST["type"] = mysql_real_escape_string($_POST["type"]);
-	$_POST["area"] = mysql_real_escape_string($_POST["area"]);
 	
 	if($_POST["type"] != "D" && $_POST["type"] != "F") die("NOK;Invalid document type");
 	
 	$where = "area_name = '".$_POST["area"]."'";
 	if($sdbc->select('area', 'area_aid', $where))
-		die("NOK;Could not accquire area data: ".mysql_error());
+		die("NOK;Could not accquire area data: ".$sdbc->lastError());
 	$row     = $sdbc->nextData();
 	$area_id = $row["area_aid"];
 	   
@@ -30,17 +26,16 @@
 	if($sdbc->insert('object', array('object_name' => $_POST["name"],
 	                                  'object_parent' => $_POST["parent"],
 									  'object_type' => $_POST["type"],
-									  'object_areaid' => $area_id)))
-		die("NOK;Error while creation of object: ".mysql_error());
+									  'object_areaid' => $area_id,
+									  'object_locked_uid' => 0)))
+		die("NOK;Error while creation of object: ".$sdbc->lastError());
 	$oid = $sdbc->lastId();
 	
 	if($_POST["type"] == "D")
 	{
-		$request = "INSERT INTO object_data(object_data_id, object_data_text, object_data_last_change, object_data_last_user) ".
-		           "VALUES($oid, '', FROM_UNIXTIME(".time()."), ".$_SESSION["uid"].")";
 		$data = array('object_data_id' => $oid,
 		               'object_data_text' => '',
-					   'object_data_last_change' => 'FROM_UNIXTIME('.time().')',
+					   'object_data_last_change' => time(),
 					   'object_data_last_user' => $_SESSION["uid"]);
 		if($sdbc->insert('object_data', $data))
 			die("NOK;Document was created, but the System was not able to create an object data record! [".$sdbc->lastError()."]");
